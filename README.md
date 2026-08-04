@@ -1,0 +1,75 @@
+# T.O.P — Top One Percent · Landing Site
+
+Rebuilt UI/UX for the Top One Percent marketing site and digital card.
+React 19 + Vite + Tailwind CSS v4 + React Router.
+
+## Run it
+
+```bash
+cd top-site
+npm install
+npm run dev      # http://localhost:5173
+npm run build    # production build to dist/
+npm run preview  # preview the build
+```
+
+## Structure
+
+```
+src/
+  data/site.js          all copy + content in one place (single source of truth)
+  hooks/
+    useReveal.js        IntersectionObserver scroll reveals with auto-stagger
+    useScrollState.js   rAF-throttled scroll state + active-section spy
+  components/
+    Navbar.jsx  Hero.jsx  Marquee.jsx  Services.jsx  Work.jsx
+    Process.jsx About.jsx FAQ.jsx  CTABanner.jsx  Contact.jsx  Footer.jsx
+  pages/
+    Home.jsx            section order = persuasion arc
+    Card.jsx            /card digital business card
+  index.css             design tokens + component layer
+```
+
+## What changed and why
+
+### Structural / UX
+- **Page arc rebuilt**: promise → capability → proof → method → people → objections → action. Added two missing sections: **Process** (removes "what happens after I email?" anxiety) and **FAQ** (handles price, ownership, timeline, location objections before the form).
+- **Hero rewritten around a value proposition.** "Built different. Built to last." is a slogan, not a headline — it's now demoted to the card/footer and the H1 states what you do and for whom. Research on hero sections consistently shows clear benefit headlines beating clever ones.
+- **One primary CTA**, everywhere. "Start a Project" is the only gold button on the page; everything else is visually secondary.
+- **Trust signals moved above the fold**: availability pill ("Taking 2 projects · Q3 2026"), live product bento, four proof stats, and a "reply within 24h" microcopy line next to the CTA.
+- **Hover-gated content eliminated.** Service details, pricing and "Learn more" used to appear only on `:hover` — invisible on touch and to keyboard users. All content is now always visible; hover adds emphasis only.
+- **Work cards gained metrics** so each project makes a claim instead of just describing itself.
+
+### Interaction
+- **Navbar**: condenses on scroll, hides on downward scroll, sliding active-section indicator driven by an IntersectionObserver, and a hairline reading-progress bar.
+- **Mobile menu**: `max-h` transition replaced with a real sheet — body scroll lock, Escape to close, focus returned to the trigger, `aria-expanded`/`aria-controls` wired.
+- **Marquee**: pauses on hover, edge fades, `sr-only` text equivalent, GPU-friendly `translate3d`.
+- **FAQ** uses native `<details>` so keyboard and screen-reader behaviour is free.
+- **Card page**: added the two things a digital card is actually for — **Save contact** (generates a real `.vcf`) and **Share** (Web Share API with clipboard fallback) — plus a toast in an `aria-live` region.
+
+### Contact form (biggest UX debt)
+- Real inline validation with human error messages, validate-on-blur then validate-on-change.
+- Failed submit focuses the first invalid field instead of leaving the user hunting.
+- `aria-invalid` / `aria-describedby` on every field, `role="alert"` on the failure state, `aria-live` status announcements.
+- Added an optional **timeline** chip group, character counter, deselectable budget chips (`aria-pressed`), `autoComplete` and `inputMode` on every input.
+- Success state confirms what happens next and offers a way back.
+
+### Visual system
+- Tokens consolidated into Tailwind v4 `@theme` — one gold accent, no ad-hoc hex values scattered in JSX.
+- Buttons now have a gradient fill, soft accent glow, press state and hover arrow-nudge; 48px minimum target.
+- Cards get layered shadow + 3px lift instead of a bare border colour change.
+- Subtle grain, ambient radial light and editorial grid lines add depth without noise.
+- Fluid type via `clamp()`, `text-wrap: balance` on headings, `pretty` on paragraphs.
+
+### Accessibility & performance
+- `prefers-reduced-motion` is fully honoured — all animation and reveals collapse to static.
+- Skip-to-content link, visible `:focus-visible` rings, semantic landmarks (`<header>`, `<main>`, `<nav aria-label>`, `<ol>`/`<ul>` for lists).
+- All decorative gradients and dots marked `aria-hidden`.
+- Scroll listeners rAF-throttled; observers disconnect after reveal. Build is ~88 kB gzipped JS, 9 kB CSS.
+- SEO/social meta, canonical URL, font preconnect in `index.html`.
+
+## Before you ship
+
+1. Replace `FORM_ENDPOINT` in `src/components/Contact.jsx` with your real Formspree ID.
+2. Confirm the social URLs in `src/data/site.js`.
+3. If deploying to a static host, add an SPA rewrite so `/card` resolves.
