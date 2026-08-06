@@ -93,7 +93,18 @@ export default function Contact() {
               <li className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse-slow" aria-hidden="true" />
                 <a href={`mailto:${SITE.email}`} className="text-gold underline-offset-4 hover:underline">
-                  {SITE.email}
+                  {SITE.emailDisplay}
+                </a>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse-slow" aria-hidden="true" />
+                <a
+                  href={SITE.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gold underline-offset-4 hover:underline"
+                >
+                  WhatsApp
                 </a>
               </li>
               <li className="text-subtle">Replies within 24 hours</li>
@@ -116,7 +127,7 @@ export default function Contact() {
               <h3 className="mb-3 font-syne text-2xl font-bold text-ink">Brief received.</h3>
               <p className="mx-auto mb-8 max-w-sm text-[15px] font-light text-subtle">
                 Thank you. We read every brief personally and will be in touch within
-                24 hours — check your inbox, including spam, for a reply from {SITE.email}.
+                24 hours — check your inbox, including spam, for a reply from {SITE.emailDisplay}.
               </p>
               <button type="button" onClick={() => setStatus('idle')} className="btn-outline">
                 Send another brief
@@ -222,7 +233,7 @@ export default function Contact() {
               {status === 'error' && (
                 <div role="alert" className="lg:col-span-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   Something went wrong sending the form. Please email us directly at{' '}
-                  <a href={`mailto:${SITE.email}`} className="font-medium underline">{SITE.email}</a>.
+                  <a href={`mailto:${SITE.email}`} className="font-medium underline">{SITE.emailDisplay}</a>.
                 </div>
               )}
             </form>
