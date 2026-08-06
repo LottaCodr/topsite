@@ -32,7 +32,7 @@ export default function Footer() {
               className="group inline-flex items-center gap-2.5 rounded-full border border-graphite bg-charcoal px-4 py-2.5 transition-colors hover:border-gold/50"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-gold-lt animate-pulse-slow" aria-hidden="true" />
-              <span className="text-sm text-gold-lt">{SITE.email}</span>
+              <span className="text-sm text-gold-lt">{SITE.emailDisplay}</span>
               <span className="arrow text-gold-lt/60" aria-hidden="true">→</span>
             </a>
           </div>

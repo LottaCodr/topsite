@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useReveal } from '../hooks/useReveal.js'
-import { FAQS } from '../data/site.js'
+import { FAQS, SITE } from '../data/site.js'
 
 /** Native <details> gives us keyboard + screen-reader behaviour for free;
  *  we only control the icon state. */
@@ -19,7 +19,7 @@ export default function FAQ() {
           </h2>
           <p className="text-[15px] font-light leading-relaxed text-subtle">
             Still unsure?{' '}
-            <a href="mailto:hello@topone.co" className="text-gold underline underline-offset-4 hover:text-gold-dk">
+            <a href={`mailto:${SITE.email}`} className="text-gold underline underline-offset-4 hover:text-gold-dk">
               Email us directly
             </a>{' '}
             — a real person replies within 24 hours.

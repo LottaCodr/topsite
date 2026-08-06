@@ -15,7 +15,7 @@ export default function Marquee() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-surface to-transparent" />
 
       <div className="marquee-track flex w-max" aria-hidden="true">
-        {[0, 1].map((copy) => (
+        {[0, 1, 2, 3].map((copy) => (
           <div key={copy} className="flex shrink-0">
             {ITEMS.map((item) => (
               <span key={item} className="mx-5 inline-flex items-center gap-5">

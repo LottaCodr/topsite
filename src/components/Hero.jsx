@@ -116,7 +116,7 @@ export default function Hero() {
 
           <h1
             className="display mb-5 text-ink"
-            style={{ fontSize: 'clamp(22px, 2.8vw, 40px)', maxWidth: '22ch', ...step(1) }}
+            style={{ fontSize: 'clamp(40px, 6vw, 72px)', maxWidth: '22ch', ...step(1) }}
           >
             Brand, product and motion for companies that have outgrown their{' '}
             <span className="text-gold">presentation.</span>

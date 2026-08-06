@@ -1,7 +1,9 @@
 export const SITE = {
   name: 'Top One Percent',
   short: 'T.O.P',
-  email: 'hello@topone.co',
+  email: 'toponepercent@zohomail.com',
+  emailDisplay: 'toponepercent...',
+  phone: '+2349135775141',
   location: 'Abuja, Nigeria',
   founded: '2024',
   tagline: 'Built different. Built to last.',
