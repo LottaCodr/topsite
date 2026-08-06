@@ -28,7 +28,7 @@
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
-  --animate-marquee: marquee 38s linear infinite;
+  --animate-marquee: marquee 76s linear infinite;
   --animate-pulse-slow: pulseSlow 2.6s ease-in-out infinite;
 }
 

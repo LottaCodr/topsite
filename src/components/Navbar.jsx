@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { NAV_LINKS } from '../data/site.js'
+import { NAV_LINKS, SITE } from '../data/site.js'
 import { useScrollState, useActiveSection } from '../hooks/useScrollState.js'
 
 const SECTION_IDS = NAV_LINKS.map((l) => l.id)
@@ -144,7 +144,7 @@ export default function Navbar() {
           'transition-[opacity,visibility] duration-300',
           menuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none',
         ].join(' ')}
-        style={{ maxHeight: menuOpen ? '100dvh' : 0, overflow: 'hidden', transition: 'max-height 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease, visibility 0.3s ease' }}
+        style={{ maxHeight: menuOpen ? '100dvh' : 0, overflow: menuOpen ? 'auto' : 'hidden', transition: 'max-height 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease, visibility 0.3s ease' }}
       >
         <div className="container-page flex flex-col gap-1 py-5 pb-8">
           {NAV_LINKS.map((l, i) => (
@@ -168,8 +168,8 @@ export default function Navbar() {
           </a>
           <p className="mt-3 px-3 text-xs text-subtle">
             Or email{' '}
-            <a href="mailto:hello@topone.co" className="text-gold underline underline-offset-2">
-              hello@topone.co
+            <a href={`mailto:${SITE.email}`} className="text-gold underline underline-offset-2">
+              {SITE.emailDisplay}
             </a>
           </p>
         </div>
@@ -177,3 +177,4 @@ export default function Navbar() {
     </header>
   )
 }
+

@@ -71,7 +71,7 @@ export default function Card() {
   }
 
   return (
-    <div className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-surface p-4 sm:p-6">
+    <div className="relative flex min-h-[100svh] items-start md:items-center justify-center overflow-y-auto bg-surface p-4 sm:p-6 py-8 md:py-12">
       <div
         aria-hidden="true"
         className="pointer-events-none fixed -right-24 -top-24 h-80 w-80 rounded-full"
@@ -154,7 +154,7 @@ export default function Card() {
           <div className="flex items-center gap-3 border-b border-surface2 py-3">
             <span className="w-11 shrink-0 text-[10px] uppercase tracking-[0.14em] text-subtle">Email</span>
             <a href={`mailto:${SITE.email}`} className="min-w-0 flex-1 truncate text-sm text-ink hover:text-gold">
-              {SITE.email}
+              {SITE.emailDisplay}
             </a>
             <button
               onClick={() => copy(SITE.email, 'Email copied')}
@@ -162,6 +162,34 @@ export default function Card() {
             >
               Copy<span className="sr-only"> email address</span>
             </button>
+          </div>
+
+          <div className="flex items-center gap-3 border-b border-surface2 py-3">
+            <span className="w-11 shrink-0 text-[10px] uppercase tracking-[0.14em] text-subtle">Phone</span>
+            <a href={`tel:${SITE.phone}`} className="min-w-0 flex-1 truncate text-sm text-ink hover:text-gold">
+              {SITE.phone}
+            </a>
+            <button
+              onClick={() => copy(SITE.phone, 'Phone number copied')}
+              className="rounded-md border border-border bg-surface px-3 py-1.5 text-xs text-subtle transition-colors hover:text-ink"
+            >
+              Copy<span className="sr-only"> phone number</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 border-b border-surface2 py-3">
+            <span className="w-11 shrink-0 text-[10px] uppercase tracking-[0.14em] text-subtle">WhatsApp</span>
+            <a href={`https://wa.me/${SITE.phone.replace('+', '')}`} target="_blank" rel="noreferrer noopener" className="min-w-0 flex-1 truncate text-sm text-ink hover:text-gold">
+              {SITE.phone}
+            </a>
+            <a
+              href={`https://wa.me/${SITE.phone.replace('+', '')}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="rounded-md border border-border bg-surface px-3 py-1.5 text-xs text-subtle transition-colors hover:text-ink"
+            >
+              Chat<span className="sr-only"> on WhatsApp</span>
+            </a>
           </div>
 
           <div className="flex items-center gap-3 py-3">
