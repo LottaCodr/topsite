@@ -6,7 +6,7 @@ import { PROJECTS } from '../data/site.js'
 const PROJECT_VISUALS = {
   Glimms: {
     type: 'image',
-    src: '/images/work-glimms.png',
+    src: '/images/work-glimms.webp',
     alt: 'Glimms AI fashion styling app interface',
   },
   'nēro': {

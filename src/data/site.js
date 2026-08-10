@@ -110,12 +110,52 @@ export const BELIEFS = [
   'Top one percent is not a claim. It is a daily commitment.',
 ]
 
+export const DISCIPLINES = [
+  { name: 'Branding & Identity', meta: 'from ₦500,000 · 3–5 weeks' },
+  { name: 'AI App Development', meta: 'from ₦2,500,000 · 8–16 weeks' },
+  { name: 'Motion & Animation', meta: 'from ₦350,000 · 2–4 weeks' },
+  { name: 'Artworks & Illustration', meta: 'from ₦200,000 · 1–3 weeks' },
+]
+
+/* ⚠️ PLACEHOLDER SOCIAL PROOF — replace with real client quotes before
+   launch. Swap `quote`, `name`, `role` and `org` for verified testimonials;
+   the metrics in PROOF_STATS are already real (see Work section). */
+export const TESTIMONIALS = [
+  {
+    quote: 'They took a half-formed idea and turned it into a product we were proud to put in front of users. The senior team actually stayed on the work — no handoffs.',
+    name: 'Founder',
+    role: 'Fintech startup',
+    org: 'Nigeria',
+  },
+  {
+    quote: 'The brand system arrived complete — strategy, identity, guidelines — and it made the company look like the company we always said we were.',
+    name: 'Marketing Lead',
+    role: 'Health-tech company',
+    org: 'Abuja',
+  },
+  {
+    quote: 'Fast, honest and unusually precise about scope. We knew the price, the timeline and exactly what we owned at the end. It never felt like a gamble.',
+    name: 'Product Manager',
+    role: 'Consumer app',
+    org: 'Lagos',
+  },
+]
+
+export const PROOF_STATS = [
+  ['3', 'Products shipped in-house'],
+  ['4', 'Disciplines under one roof'],
+  ['24h', 'Reply time, every brief'],
+  ['100%', 'Senior-built, zero handoff'],
+]
+
 export const FAQS = [
   { q: 'How quickly can you start?', a: 'Most engagements begin within one to two weeks of the brief being agreed. Motion and illustration work can often start sooner.' },
   { q: 'Do you work with clients outside Nigeria?', a: 'Yes. We are Abuja-based and work across time zones — most collaboration happens asynchronously with a weekly live checkpoint.' },
   { q: 'What does a project cost?', a: 'Branding starts at ₦500,000, product builds at ₦2,500,000. Every quote is fixed-scope, written down, and agreed before work begins.' },
+  { q: 'How do payments work?', a: 'Milestone-based, so you only pay for progress you can see. The exact split — typically a deposit, mid-point and handover payment — is written into the fixed-scope quote before any work starts.' },
   { q: 'Who actually does the work?', a: 'A small senior team. The people you meet in the first call are the people building your project — no handoff to juniors.' },
   { q: 'Do we own the work at the end?', a: 'Completely. Source files, repositories, design systems and documentation transfer to you at handover.' },
+  { q: 'What happens after I send a brief?', a: 'You get a reply within 24 hours — usually a short call to pressure-test the goal — then a written fixed-scope proposal with the price, timeline and deliverables. Nothing starts until you approve it.' },
 ]
 
 export const SOCIALS = [

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useReveal } from '../hooks/useReveal.js'
 import { SITE } from '../data/site.js'
 
@@ -30,6 +30,21 @@ export default function Contact() {
   const [touched, setTouched] = useState({})
   const [status, setStatus] = useState('idle') // idle | sending | sent | error
   const formRef = useRef(null)
+
+  /* Service deep-links (e.g. "Discuss this" on a service card) arrive here
+     via sessionStorage so the form opens pre-selected — one less field to
+     think about for the person who already knows what they want. */
+  useEffect(() => {
+    try {
+      const wanted = sessionStorage.getItem('top_service')
+      if (wanted) {
+        sessionStorage.removeItem('top_service')
+        if (SERVICE_OPTIONS.includes(wanted)) {
+          setForm((p) => ({ ...p, service: wanted }))
+        }
+      }
+    } catch { /* private mode — ignore */ }
+  }, [])
 
   const set = (name, value) => {
     setForm((p) => ({ ...p, [name]: value }))

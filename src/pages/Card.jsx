@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import QRCode from 'qrcode'
 import { SITE, SOCIALS } from '../data/site.js'
 
 const LETTERS = [
@@ -27,13 +28,30 @@ N:Iwuanyanwu;Lotanna;;;
 FN:Lotanna Iwuanyanwu
 ORG:Top One Percent Ltd
 TITLE:Founder & CEO
+TEL;TYPE=CELL,VOICE:${SITE.phone}
+TEL;TYPE=WORK,VOICE:${SITE.phone}
 EMAIL;TYPE=INTERNET,WORK:${SITE.email}
 URL:${SITE.url}
 ADR;TYPE=WORK:;;;Abuja;FCT;;Nigeria
+NOTE:${SITE.tagline} — ${SITE.url}
 END:VCARD`
 
 export default function Card() {
   const [toast, setToast] = useState('')
+  const [qr, setQr] = useState('')
+
+  /* QR points at the live card URL so the card is always current —
+     the "dynamic card" pattern from the digital-card research. */
+  useEffect(() => {
+    QRCode.toDataURL(`${SITE.url}/card`, {
+      margin: 1,
+      width: 640,
+      errorCorrectionLevel: 'M',
+      color: { dark: '#0A0A0A', light: '#FFFFFF' },
+    })
+      .then(setQr)
+      .catch(() => setQr(''))
+  }, [])
 
   useEffect(() => {
     if (!toast) return
@@ -219,6 +237,36 @@ export default function Card() {
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* QR — this card as a live link, ready for print or NFC */}
+        <div className="border-b border-border px-7 py-5">
+          <p className="section-label mb-3 !text-[10px]">Scan to save</p>
+          <div className="flex items-center gap-4 rounded-xl border border-border bg-surface p-4">
+            {qr ? (
+              <a
+                href={qr}
+                download="top-card-qr.png"
+                aria-label="Download this QR code as an image"
+                className="shrink-0 rounded-lg border border-border bg-white p-2 transition-transform hover:scale-[1.03]"
+              >
+                <img src={qr} alt="QR code — scan to open this contact card on another device" width={92} height={92} className="h-[92px] w-[92px]" />
+              </a>
+            ) : (
+              <div className="grid h-[92px] w-[92px] shrink-0 place-items-center rounded-lg border border-border bg-white text-[10px] text-subtle">
+                QR loading…
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="mb-1 font-syne text-sm font-bold text-ink">
+                This card, on any phone.
+              </p>
+              <p className="text-xs font-light leading-relaxed text-subtle">
+                Scan with any camera to open the live card — details stay current,
+                no reprints. Tap the code to save the image for print.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Services */}
