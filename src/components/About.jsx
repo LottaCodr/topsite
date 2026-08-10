@@ -30,32 +30,6 @@ export default function About() {
           </div>
         </div>
 
-        {/* Studio ambient image strip */}
-        <div className="reveal mb-16 overflow-hidden rounded-2xl sm:rounded-3xl">
-          <div className="relative h-52 sm:h-64 lg:h-80">
-            <img
-              src="/images/hero-visual.png"
-              alt="T.O.P studio — brand and product design work"
-              className="h-full w-full object-cover object-center"
-              loading="lazy"
-            />
-            {/* Dark overlay with brand messaging */}
-            <div
-              aria-hidden="true"
-              className="absolute inset-0"
-              style={{ background: 'linear-gradient(to right, rgba(10,10,10,0.75) 0%, rgba(10,10,10,0.2) 60%, transparent 100%)' }}
-            />
-            <div className="absolute inset-0 flex items-center">
-              <div className="container-page">
-                <p className="section-label !text-gold-lt mb-3">Our standard</p>
-                <p className="font-syne text-xl font-bold text-bone sm:text-2xl lg:text-3xl" style={{ maxWidth: '22ch' }}>
-                  Built for companies that have outgrown good enough.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Beliefs */}
         <div className="mb-16">
           <p className="reveal section-label mb-7">What we believe</p>

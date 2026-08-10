@@ -3,10 +3,10 @@ import { SERVICES } from '../data/site.js'
 
 // Map service numbers to their visual assets
 const SERVICE_IMAGES = {
-  '01': { src: '/images/svc-brand.png', alt: 'Brand identity design composition' },
-  '02': { src: '/images/svc-ai.png', alt: 'AI app development product mockup' },
-  '03': { src: '/images/svc-motion.png', alt: 'Motion design and animation visual' },
-  '04': { src: '/images/svc-illustration.png', alt: 'Digital illustration and artwork' },
+  '01': { src: '/images/svc-brand.webp', alt: 'Brand identity design composition' },
+  '02': { src: '/images/svc-ai.webp', alt: 'AI app development product mockup' },
+  '03': { src: '/images/svc-motion.webp', alt: 'Motion design and animation visual' },
+  '04': { src: '/images/svc-illustration.webp', alt: 'Digital illustration and artwork' },
 }
 
 export default function Services() {
@@ -88,6 +88,11 @@ export default function Services() {
 
                     <a
                       href="#contact"
+                      onClick={() => {
+                        /* Pre-select this service in the contact form
+                           (read once on mount by Contact.jsx). */
+                        try { sessionStorage.setItem('top_service', svc.name) } catch { /* private mode */ }
+                      }}
                       className="mt-auto inline-flex items-center gap-2 font-syne text-[13px] font-semibold text-ink transition-colors hover:text-gold"
                     >
                       Discuss this <span className="arrow" aria-hidden="true">→</span>

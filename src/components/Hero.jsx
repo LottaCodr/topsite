@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SITE } from '../data/site.js'
 
 const LETTERS = [
@@ -24,11 +24,37 @@ const reduced = () =>
 export default function Hero() {
   const [loaded, setLoaded] = useState(false)
   const [instant, setInstant] = useState(false)
+  const visualRef = useRef(null)
 
   useEffect(() => {
     if (reduced()) { setInstant(true); setLoaded(true); return }
     const t = setTimeout(() => setLoaded(true), 80)
     return () => clearTimeout(t)
+  }, [])
+
+  /* Subtle scroll-linked parallax on the hero visual — the visual drifts
+     slower than the page, adding depth. rAF-throttled; disabled for users
+     who prefer reduced motion and on touch where it can feel gimmicky. */
+  useEffect(() => {
+    const el = visualRef.current
+    if (!el || reduced() || window.matchMedia?.('(pointer: coarse)').matches) return
+
+    let raf = null
+    const onScroll = () => {
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = null
+        const y = window.scrollY
+        if (y < window.innerHeight * 1.2) {
+          el.style.transform = `translate3d(0, ${y * 0.055}px, 0)`
+        }
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
   }, [])
 
   const step = (i) => ({
@@ -65,6 +91,15 @@ export default function Hero() {
           maskImage: 'linear-gradient(to bottom, transparent, black 22%, black 72%, transparent)',
         }}
       />
+
+      {/* Giant faded monogram — editorial watermark behind the copy */}
+      <span
+        aria-hidden="true"
+        className="top-wordmark pointer-events-none absolute -top-[0.28em] left-1/2 -translate-x-1/2 select-none text-ink/[0.045]"
+        style={{ fontSize: 'clamp(200px, 46vw, 720px)', letterSpacing: '-0.05em' }}
+      >
+        T.O.P.
+      </span>
 
       <div className="container-page relative z-10 grid items-start gap-10 lg:grid-cols-12 lg:items-center lg:gap-10">
         {/* ------------------------------------------------ copy column */}
@@ -119,7 +154,7 @@ export default function Hero() {
             style={{ fontSize: 'clamp(40px, 6vw, 72px)', maxWidth: '22ch', ...step(1) }}
           >
             Brand, product and motion for companies that have outgrown their{' '}
-            <span className="text-gold">presentation.</span>
+            <span className="gold-underline relative inline-block text-gold">presentation.</span>
           </h1>
 
           <p
@@ -143,7 +178,7 @@ export default function Hero() {
 
         {/* ------------------------------------------- visual column */}
         <div className="lg:col-span-6 xl:col-span-7" style={step(4)}>
-          <div className="relative">
+          <div ref={visualRef} className="relative" style={{ willChange: 'transform' }}>
             {/* Glow behind the visual */}
             <div
               aria-hidden="true"
@@ -153,11 +188,12 @@ export default function Hero() {
             {/* Hero image — full editorial visual */}
             <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-border/60 shadow-[0_24px_64px_-24px_rgba(16,14,10,0.18)]">
               <img
-                src="/images/hero-visual.png"
+                src="/images/hero-visual.webp"
                 alt="T.O.P brand identity and product design work"
                 className="w-full object-cover"
                 style={{ aspectRatio: '16/10', objectPosition: 'center' }}
                 loading="eager"
+                decoding="async"
               />
               {/* Gradient overlay at the bottom for the stats to sit on */}
               <div

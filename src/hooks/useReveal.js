@@ -46,9 +46,3 @@ export function useReveal({ threshold = 0.12, stagger = 70 } = {}) {
 
   return ref
 }
-
-/** True once the page has settled — used to gate hero entrance animation. */
-export function useMounted(delay = 60) {
-  const ref = useRef(false)
-  return ref
-}
