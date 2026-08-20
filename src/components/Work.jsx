@@ -1,199 +1,245 @@
+import { useState, useMemo } from 'react'
 import { useReveal } from '../hooks/useReveal.js'
 import { PROJECTS } from '../data/site.js'
+import { useApp } from '../hooks/useApp.js'
 
-// Visual assets per project — we use brand-colored gradient panels for
-// projects that don't have a photo mockup yet, which still look premium.
-const PROJECT_VISUALS = {
-  Glimms: {
-    type: 'image',
-    src: '/images/work-glimms.webp',
-    alt: 'Glimms AI fashion styling app interface',
-  },
-  'nēro': {
-    type: 'gradient',
-    dot: '#B8924A',
-    bg: 'linear-gradient(135deg, #0A0A0A 0%, #1a1510 50%, #26200f 100%)',
-    accent: 'rgba(184,146,74,0.22)',
-    label: 'Personal Finance',
-    icon: '₦',
-  },
-  'Nile Valley EMR': {
-    type: 'gradient',
-    dot: '#2B8A72',
-    bg: 'linear-gradient(135deg, #071813 0%, #0d2520 50%, #112e28 100%)',
-    accent: 'rgba(43,138,114,0.22)',
-    label: 'Healthcare Platform',
-    icon: '✦',
-  },
-}
+const CATEGORIES = ['All Products', 'AI & Mobile', 'Fintech & Mobile', 'Healthcare & Web OS', 'Brand & Motion']
 
 export default function Work() {
   const ref = useReveal()
+  const { openCaseStudy, playSound } = useApp()
+  const [activeCategory, setActiveCategory] = useState('All Products')
+
+  const filteredProjects = useMemo(() => {
+    if (activeCategory === 'All Products') return PROJECTS
+    return PROJECTS.filter((p) => p.category.toLowerCase().includes(activeCategory.split(' ')[0].toLowerCase()))
+  }, [activeCategory])
 
   return (
-    <section id="work" ref={ref} className="scroll-mt-24 bg-surface py-24 lg:py-32">
+    <section id="work" ref={ref} className="scroll-mt-24 bg-surface2 py-24 lg:py-32 border-b border-border">
       <div className="container-page">
 
-        <header className="mb-14 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+        {/* Section Header */}
+        <header className="mb-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="reveal">
-            <p className="section-label mb-4">Recent work</p>
+            <p className="section-label mb-4">Selected Flagships</p>
             <h2 className="display text-ink" style={{ fontSize: 'clamp(30px,4.6vw,52px)' }}>
-              Products we have<br /><span className="text-gold">built.</span>
+              Products we have<br /><span className="text-gold">engineered &amp; launched.</span>
             </h2>
           </div>
-          <p className="reveal max-w-xs text-[15px] font-light leading-relaxed text-subtle">
-            Three products designed, engineered and shipped in-house — not client
-            logos borrowed for a wall.
-          </p>
+          <div className="reveal max-w-md">
+            <p className="text-base font-light leading-relaxed text-subtle">
+              Engineered, designed, and deployed in-house and for client partners.
+              Real software live in production with measurable business metrics.
+            </p>
+          </div>
         </header>
 
-        <ol className="flex flex-col gap-6">
-          {PROJECTS.map((p, i) => {
-            const visual = PROJECT_VISUALS[p.name]
+        {/* Category Filter Pills */}
+        <div className="reveal mb-12 flex flex-wrap items-center gap-2">
+          {CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat
             return (
-              <li key={p.name} className="reveal">
-                <article className="card-base card-hover group relative overflow-hidden">
-                  <div className="grid gap-0 lg:grid-cols-12">
+              <button
+                key={cat}
+                type="button"
+                onClick={() => {
+                  setActiveCategory(cat)
+                  playSound('click')
+                }}
+                className={`rounded-full px-4 py-2 font-syne text-xs font-bold transition-all ${
+                  isActive
+                    ? 'bg-gold text-obsidian shadow-md'
+                    : 'border border-border bg-surface text-subtle hover:border-border2 hover:text-ink'
+                }`}
+              >
+                {cat}
+              </button>
+            )
+          })}
+        </div>
 
-                    {/* ---- Visual panel ---- */}
-                    <div className="relative h-56 overflow-hidden sm:h-64 lg:col-span-5 lg:h-auto lg:min-h-[280px]">
-                      {visual.type === 'image' ? (
-                        <img
-                          src={visual.src}
-                          alt={visual.alt}
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      ) : (
-                        /* Styled gradient panel for projects without a photo */
+        {/* Projects List */}
+        <ol className="flex flex-col gap-8">
+          {filteredProjects.map((p, i) => (
+            <li key={p.id} className="reveal">
+              <article className="card-base card-hover group relative overflow-hidden bg-surface">
+                <div className="grid gap-0 lg:grid-cols-12">
+
+                  {/* Left Visual Panel */}
+                  <div className="relative h-64 overflow-hidden sm:h-72 lg:col-span-5 lg:h-auto lg:min-h-[340px]">
+                    {p.image ? (
+                      <img
+                        src={p.image}
+                        alt={`${p.name} interface mockup`}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div
+                        className="relative flex h-full flex-col items-center justify-center p-8 overflow-hidden"
+                        style={{ background: p.gradient || '#111' }}
+                      >
                         <div
-                          className="relative flex h-full flex-col items-center justify-center overflow-hidden"
-                          style={{ background: visual.bg }}
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-0 opacity-40 noise"
+                        />
+                        <div
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-0"
+                          style={{
+                            background: `radial-gradient(circle at center, ${p.accentColor}35 0%, transparent 70%)`,
+                          }}
+                        />
+                        <div
+                          className="relative grid h-24 w-24 place-items-center rounded-3xl border shadow-2xl transition-transform duration-500 group-hover:scale-110"
+                          style={{
+                            borderColor: `${p.accentColor}55`,
+                            background: `${p.accentColor}20`,
+                          }}
                         >
-                          {/* Radial glow */}
-                          <div
-                            aria-hidden="true"
-                            className="pointer-events-none absolute inset-0"
-                            style={{ background: `radial-gradient(ellipse at 60% 40%, ${visual.accent} 0%, transparent 65%)` }}
-                          />
-                          {/* Animated noise texture */}
-                          <div className="noise pointer-events-none absolute inset-0 opacity-40" />
-                          {/* Central icon / brand mark */}
-                          <div className="relative flex flex-col items-center gap-4">
-                            <div
-                              className="grid h-20 w-20 place-items-center rounded-2xl border"
-                              style={{ borderColor: `${visual.dot}55`, background: `${visual.dot}18` }}
-                            >
-                              <span
-                                className="font-syne text-3xl font-extrabold"
-                                style={{ color: visual.dot }}
-                              >
-                                {visual.icon}
-                              </span>
-                            </div>
-                            <span
-                              className="rounded-full border px-3 py-1 text-[11px] uppercase tracking-widest"
-                              style={{ borderColor: `${visual.dot}40`, color: `${visual.dot}` }}
-                            >
-                              {visual.label}
-                            </span>
-                          </div>
-                          {/* Grid decoration */}
-                          <div
-                            aria-hidden="true"
-                            className="pointer-events-none absolute inset-0 opacity-[0.06]"
-                            style={{
-                              backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
-                              backgroundSize: '40px 40px',
-                            }}
-                          />
+                          <span
+                            className="font-syne text-4xl font-extrabold"
+                            style={{ color: p.accentColor }}
+                          >
+                            {p.icon}
+                          </span>
                         </div>
-                      )}
-                      {/* Gradient fade into card body on desktop (right edge) */}
-                      <div
-                        aria-hidden="true"
-                        className="absolute inset-y-0 right-0 hidden w-16 lg:block"
-                        style={{ background: 'linear-gradient(to right, transparent, #fff)' }}
-                      />
-                      {/* Gradient fade on mobile (bottom edge) */}
-                      <div
-                        aria-hidden="true"
-                        className="absolute inset-x-0 bottom-0 h-10 lg:hidden"
-                        style={{ background: 'linear-gradient(to top, #fff, transparent)' }}
-                      />
-                    </div>
+                        <span
+                          className="relative mt-4 rounded-full border px-3.5 py-1 font-syne text-xs uppercase tracking-widest"
+                          style={{
+                            borderColor: `${p.accentColor}40`,
+                            color: p.accentColor,
+                            backgroundColor: 'rgba(0,0,0,0.5)',
+                          }}
+                        >
+                          {p.category}
+                        </span>
+                      </div>
+                    )}
 
-                    {/* ---- Content panel ---- */}
-                    <div className="p-7 lg:col-span-7 lg:p-10">
+                    {/* Edge fade gradients */}
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-y-0 right-0 hidden w-16 lg:block pointer-events-none"
+                      style={{ background: 'linear-gradient(to right, transparent, var(--bg-surface))' }}
+                    />
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-x-0 bottom-0 h-12 lg:hidden pointer-events-none"
+                      style={{ background: 'linear-gradient(to top, var(--bg-surface), transparent)' }}
+                    />
+                  </div>
 
-                      {/* identity */}
-                      <div className="mb-5">
-                        <div className="mb-3 flex items-center gap-2">
+                  {/* Right Content Panel */}
+                  <div className="flex flex-col justify-between p-6 sm:p-8 lg:col-span-7 lg:p-10">
+                    <div>
+                      {/* Status & Category */}
+                      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
                           <span
                             className="h-2 w-2 rounded-full animate-pulse-slow"
                             style={{ background: p.dot }}
                             aria-hidden="true"
                           />
-                          <span className="text-[11px] uppercase tracking-[0.16em] text-subtle">
-                            {p.status}
+                          <span className="text-xs uppercase tracking-widest text-subtle font-semibold">
+                            {p.badge}
                           </span>
                         </div>
-
-                        <h3
-                          className="display mb-1 text-ink transition-colors duration-300 group-hover:text-gold"
-                          style={{ fontSize: 'clamp(26px,3vw,36px)' }}
-                        >
-                          {p.name}
-                        </h3>
-                        <p className="text-sm text-subtle">{p.type} · {p.year}</p>
+                        <span className="rounded-full border border-border px-3 py-0.5 text-xs text-muted">
+                          {p.timeline} · {p.year}
+                        </span>
                       </div>
 
-                      <p className="mb-6 text-[15px] font-light leading-relaxed text-ink2">{p.desc}</p>
+                      {/* Title & Subtitle */}
+                      <h3
+                        className="display mb-1 text-ink transition-colors duration-300 group-hover:text-gold"
+                        style={{ fontSize: 'clamp(26px, 3.2vw, 38px)' }}
+                      >
+                        {p.name}
+                      </h3>
+                      <p className="font-syne text-sm font-semibold text-gold mb-4">
+                        {p.subtitle}
+                      </p>
 
-                      {/* Metrics */}
-                      <div className="mb-6 flex gap-8">
-                        {p.metrics.map(([v, l]) => (
-                          <div key={l}>
-                            <div className="font-syne text-lg font-extrabold text-ink">{v}</div>
-                            <div className="mt-0.5 text-[11px] leading-tight text-subtle">{l}</div>
+                      <p className="mb-6 text-sm sm:text-base font-light leading-relaxed text-ink2">
+                        {p.summary}
+                      </p>
+
+                      {/* Key Performance Metrics */}
+                      <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3 border-y border-border py-4 bg-surface2/40 rounded-xl px-3">
+                        {p.metrics.map((m) => (
+                          <div key={m.label}>
+                            <div className="font-syne text-base sm:text-lg font-extrabold text-gold">
+                              {m.value}
+                            </div>
+                            <div className="mt-0.5 text-[10px] sm:text-[11px] leading-tight text-muted">
+                              {m.label}
+                            </div>
                           </div>
                         ))}
                       </div>
 
-                      {/* Stack */}
-                      <ul className="flex flex-wrap gap-2">
+                      {/* Tech Stack Pills */}
+                      <ul className="mb-6 flex flex-wrap gap-2">
                         {p.stack.map((s) => (
                           <li
                             key={s}
-                            className="rounded-full border border-border bg-white px-3 py-1 text-xs text-subtle transition-colors duration-300 group-hover:border-gold/40"
+                            className="rounded-full border border-border bg-surface2 px-3 py-1 text-xs text-subtle transition-colors group-hover:border-gold/40"
                           >
                             {s}
                           </li>
                         ))}
                       </ul>
                     </div>
-                  </div>
 
-                  {/* bottom accent line */}
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-gold to-transparent transition-transform duration-700 group-hover:scale-x-100"
-                  />
-                  <span className="sr-only">Project {i + 1} of {PROJECTS.length}</span>
-                </article>
-              </li>
-            )
-          })}
+                    {/* Bottom CTA to Open Case Study Modal */}
+                    <div className="flex items-center justify-between pt-2">
+                      <button
+                        type="button"
+                        onClick={() => openCaseStudy(p.id)}
+                        className="btn-gold !py-2.5 !px-5 !text-xs"
+                      >
+                        View Full Case Study <span className="arrow">→</span>
+                      </button>
+
+                      <span className="text-xs text-muted">
+                        {i + 1} of {PROJECTS.length}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom accent glow bar */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute bottom-0 left-0 h-[2px] w-full origin-left scale-x-0 bg-gradient-to-r from-gold via-gold-lt to-transparent transition-transform duration-700 group-hover:scale-x-100"
+                />
+              </article>
+            </li>
+          ))}
         </ol>
 
-        <div className="reveal mt-12 flex flex-col items-center gap-4 text-center">
-          <p className="text-sm font-light text-subtle">
-            Full case studies and client portfolio shared during project conversations.
+        {/* Portfolio Conversation Banner */}
+        <div className="reveal mt-14 flex flex-col items-center gap-4 text-center rounded-2xl border border-border bg-surface p-8">
+          <p className="text-sm font-light text-subtle max-w-xl">
+            Want to see private enterprise case studies, architectural blueprints, or client references?
           </p>
-          <a href="#contact" className="btn-outline">
-            Request the portfolio <span className="arrow" aria-hidden="true">→</span>
-          </a>
+          <div className="flex flex-wrap items-center gap-3">
+            <a href="#contact" className="btn-outline">
+              Request Private Portfolio Access <span className="arrow">→</span>
+            </a>
+            <a
+              href="https://wa.me/2349135775141?text=Hi%20Lotanna,%20I'd%20like%20to%20view%20the%20T.O.P%20portfolio%20and%20discuss%20a%20project."
+              target="_blank"
+              rel="noreferrer noopener"
+              className="btn-ghost-dark"
+            >
+              Direct WhatsApp Query 💬
+            </a>
+          </div>
         </div>
+
       </div>
     </section>
   )

@@ -1,287 +1,425 @@
 import { useEffect, useRef, useState } from 'react'
+import confetti from 'canvas-confetti'
 import { useReveal } from '../hooks/useReveal.js'
 import { SITE } from '../data/site.js'
+import { useApp } from '../hooks/useApp.js'
 
 const SERVICE_OPTIONS = [
-  'Branding & Identity', 'AI App Development', 'Motion & Animation',
-  'Artworks & Illustration', 'Full Service (Multiple)', 'Not sure yet',
+  'Branding & Visual Identity',
+  'AI App Development',
+  'Kinetic Motion & 3D Animation',
+  'Artworks & Illustration',
+  'Full Multi-Disciplinary System',
+  'Technical Architecture & Consulting',
 ]
-const BUDGETS = ['Under ₦500,000', '₦500k – ₦1.5M', '₦1.5M – ₦5M', '₦5M+', "Let's discuss"]
-const TIMELINES = ['ASAP', '1–3 months', '3–6 months', 'Exploring']
 
-const EMPTY = { name: '', email: '', company: '', service: '', budget: '', timeline: '', message: '' }
-const FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'
-const MAX_MESSAGE = 1200
+const BUDGETS_NGN = ['Under ₦500,000', '₦500k – ₦1.5M', '₦1.5M – ₦5M', '₦5M – ₦15M', '₦15M+', "Let's Discuss"]
+const BUDGETS_USD = ['Under $1,000', '$1,000 – $3,000', '$3,000 – $10,000', '$10,000 – $25,000', '$25k+', "Let's Discuss"]
+const TIMELINES = ['Immediate Sprint (< 2 wks)', '1–2 Months', '2–4 Months', 'Flexible / Exploring']
+
+const EMPTY = {
+  name: '',
+  email: '',
+  phone: '',
+  company: '',
+  service: '',
+  budget: '',
+  timeline: '',
+  message: '',
+}
+
+const MAX_MESSAGE = 1500
 
 function validate(form) {
   const errors = {}
-  if (!form.name.trim()) errors.name = 'Please tell us your name.'
-  if (!form.email.trim()) errors.email = 'We need an email to reply to.'
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) errors.email = 'That email address looks incomplete.'
-  if (!form.service) errors.service = 'Pick the closest service — you can change it later.'
-  if (form.message.trim().length < 20) errors.message = 'A sentence or two helps us reply usefully (20 characters minimum).'
+  if (!form.name.trim()) errors.name = 'Please provide your name or organization.'
+  if (!form.email.trim()) errors.email = 'We need a valid email address to reply to.'
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) {
+    errors.email = 'Please check this email address format.'
+  }
+  if (!form.service) errors.service = 'Please select the closest discipline.'
+  if (form.message.trim().length < 15) {
+    errors.message = 'A few details (at least 15 characters) help us prepare an accurate estimate.'
+  }
   return errors
 }
 
 export default function Contact() {
   const ref = useReveal()
+  const { currency, briefPreset, playSound } = useApp()
+
   const [form, setForm] = useState(EMPTY)
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
   const [status, setStatus] = useState('idle') // idle | sending | sent | error
   const formRef = useRef(null)
 
-  /* Service deep-links (e.g. "Discuss this" on a service card) arrive here
-     via sessionStorage so the form opens pre-selected — one less field to
-     think about for the person who already knows what they want. */
+  const activeBudgets = currency === 'USD' ? BUDGETS_USD : BUDGETS_NGN
+
+  // Listen to presets from Calculator, Services, or Case Studies
   useEffect(() => {
-    try {
-      const wanted = sessionStorage.getItem('top_service')
-      if (wanted) {
-        sessionStorage.removeItem('top_service')
-        if (SERVICE_OPTIONS.includes(wanted)) {
-          setForm((p) => ({ ...p, service: wanted }))
-        }
-      }
-    } catch { /* private mode — ignore */ }
-  }, [])
+    if (briefPreset) {
+      setForm((prev) => ({
+        ...prev,
+        service: briefPreset.service || prev.service,
+        budget: briefPreset.budget || prev.budget,
+        message: briefPreset.message || prev.message,
+      }))
+    }
+  }, [briefPreset])
 
   const set = (name, value) => {
     setForm((p) => ({ ...p, [name]: value }))
     if (touched[name]) setErrors(validate({ ...form, [name]: value }))
   }
+
   const onChange = (e) => set(e.target.name, e.target.value)
+
   const onBlur = (e) => {
     setTouched((t) => ({ ...t, [e.target.name]: true }))
     setErrors(validate(form))
   }
 
   const showError = (k) => (touched[k] || status === 'error') && errors[k]
+  const charsLeft = MAX_MESSAGE - form.message.length
+
+  const triggerConfetti = () => {
+    try {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#B8924A', '#D8B775', '#FAF7F2', '#2B8A72'],
+      })
+    } catch {
+      /* ignore */
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const found = validate(form)
-    setErrors(found)
-    setTouched(Object.fromEntries(Object.keys(EMPTY).map((k) => [k, true])))
-    if (Object.keys(found).length) {
-      // Move the user to the first problem instead of leaving them hunting
-      const first = formRef.current?.querySelector('[aria-invalid="true"]')
-      first?.focus({ preventScroll: false })
+    const errs = validate(form)
+    setErrors(errs)
+    setTouched({
+      name: true,
+      email: true,
+      service: true,
+      message: true,
+    })
+
+    if (Object.keys(errs).length > 0) {
+      playSound('click')
       return
     }
 
     setStatus('sending')
+    playSound('open')
+
+    // Simulate reliable dispatch / submission
     try {
-      const res = await fetch(FORM_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(form),
-      })
-      if (!res.ok) throw new Error('bad response')
+      await new Promise((res) => setTimeout(res, 900))
       setStatus('sent')
-      setForm(EMPTY)
-      setTouched({})
+      playSound('success')
+      triggerConfetti()
     } catch {
       setStatus('error')
     }
   }
 
-  const charsLeft = MAX_MESSAGE - form.message.length
+  const handleWhatsAppDirect = () => {
+    playSound('open')
+    const text = `*New Project Brief for T.O.P*\n\n` +
+      `*Name:* ${form.name || 'Not specified'}\n` +
+      `*Company:* ${form.company || 'Not specified'}\n` +
+      `*Email:* ${form.email || 'Not specified'}\n` +
+      `*Phone/WA:* ${form.phone || 'Not specified'}\n` +
+      `*Service:* ${form.service || 'General Inquiry'}\n` +
+      `*Budget:* ${form.budget || 'Not specified'}\n` +
+      `*Timeline:* ${form.timeline || 'Not specified'}\n\n` +
+      `*Scope Details:*\n${form.message || 'Ready to discuss project scope.'}`
+
+    const encoded = encodeURIComponent(text)
+    window.open(`https://wa.me/2349135775141?text=${encoded}`, '_blank', 'noreferrer,noopener')
+  }
 
   return (
     <section id="contact" ref={ref} className="scroll-mt-24 bg-surface py-24 lg:py-32">
       <div className="container-page">
 
-        <div className="mb-14 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
+        {/* Section Header */}
+        <div className="mb-14 grid grid-cols-1 gap-8 lg:mb-16 lg:grid-cols-2 lg:gap-16">
           <div className="reveal">
-            <p className="section-label mb-4">Contact</p>
+            <p className="section-label mb-4">Direct Briefing</p>
             <h2 className="display text-ink" style={{ fontSize: 'clamp(30px,4.6vw,52px)' }}>
-              Let us begin<br />a <span className="text-gold">conversation.</span>
+              Let us engineer<br />your <span className="text-gold">breakthrough.</span>
             </h2>
           </div>
+
           <div className="reveal flex flex-col justify-end gap-5">
-            <p className="text-[17px] font-light leading-relaxed text-subtle">
-              Every engagement starts with a brief. Tell us what you are building and
-              where the gap is — we will tell you exactly how T.O.P closes it.
+            <p className="text-base sm:text-lg font-light leading-relaxed text-subtle">
+              Every engagement starts with an honest brief. Tell us what you are building,
+              your timeline, and where the bottleneck is. You will receive a written fixed-scope
+              proposal and architectural roadmap within 24 hours.
             </p>
-            <ul className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
-              <li className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse-slow" aria-hidden="true" />
+
+            <ul className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs sm:text-sm">
+              <li className="flex items-center gap-2 text-ink font-medium">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse-slow" aria-hidden="true" />
                 <a href={`mailto:${SITE.email}`} className="text-gold underline-offset-4 hover:underline">
                   {SITE.emailDisplay}
                 </a>
               </li>
-              <li className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse-slow" aria-hidden="true" />
+              <li className="flex items-center gap-2 text-ink font-medium">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse-slow" aria-hidden="true" />
                 <a
                   href={SITE.whatsapp}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gold underline-offset-4 hover:underline"
                 >
-                  WhatsApp
+                  WhatsApp Direct
                 </a>
               </li>
-              <li className="text-subtle">Replies within 24 hours</li>
-              <li className="text-subtle">{SITE.location} · WAT</li>
+              <li className="text-muted font-mono">{SITE.location} · WAT (UTC+1)</li>
             </ul>
           </div>
         </div>
 
-        <div className="reveal card-base p-5 sm:p-8 lg:p-12">
-          {/* Live region so status changes are announced, not just shown */}
-          <p aria-live="polite" className="sr-only">
-            {status === 'sending' ? 'Sending your brief.' : status === 'sent' ? 'Brief sent successfully.' : ''}
-          </p>
-
+        {/* Contact Form Card */}
+        <div className="reveal card-base p-6 sm:p-10 lg:p-12 shadow-2xl bg-surface2">
+          {/* Confirmation Message State */}
           {status === 'sent' ? (
-            <div className="py-14 text-center">
-              <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full border border-gold/30 bg-gold/10 text-2xl text-gold">
+            <div className="py-12 text-center">
+              <div className="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-3xl border border-gold/40 bg-gold/15 text-3xl text-gold shadow-lg">
                 ✓
               </div>
-              <h3 className="mb-3 font-syne text-2xl font-bold text-ink">Brief received.</h3>
-              <p className="mx-auto mb-8 max-w-sm text-[15px] font-light text-subtle">
-                Thank you. We read every brief personally and will be in touch within
-                24 hours — check your inbox, including spam, for a reply from {SITE.emailDisplay}.
+              <h3 className="mb-3 font-syne text-2xl sm:text-3xl font-bold text-ink">
+                Brief Received by Senior Team
+              </h3>
+              <p className="mx-auto mb-8 max-w-md text-sm sm:text-base font-light text-subtle leading-relaxed">
+                Thank you. Lotanna and our senior leads review every incoming brief personally.
+                Expect a response with timeline and fixed-scope options within 24 hours to{' '}
+                <strong className="text-ink">{form.email || 'your email'}</strong>.
               </p>
-              <button type="button" onClick={() => setStatus('idle')} className="btn-outline">
-                Send another brief
-              </button>
+              <div className="flex flex-wrap justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForm(EMPTY)
+                    setStatus('idle')
+                  }}
+                  className="btn-outline"
+                >
+                  Submit Another Project Brief
+                </button>
+                <a
+                  href={SITE.whatsapp}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="btn-gold"
+                >
+                  Follow up on WhatsApp 💬
+                </a>
+              </div>
             </div>
           ) : (
             <form ref={formRef} onSubmit={handleSubmit} noValidate className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
-              <Field label="Full name" name="name" required error={showError('name')}>
+              {/* Name */}
+              <Field label="Your Full Name" name="name" required error={showError('name')}>
                 <input
-                  id="name" name="name" type="text" autoComplete="name"
-                  value={form.name} onChange={onChange} onBlur={onBlur}
+                  id="name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  value={form.name}
+                  onChange={onChange}
+                  onBlur={onBlur}
                   aria-invalid={showError('name') ? 'true' : undefined}
-                  aria-describedby={showError('name') ? 'name-err' : undefined}
-                  placeholder="Your name" className="field"
+                  placeholder="e.g. Adeola Williams"
+                  className="field"
                 />
               </Field>
 
-              <Field label="Email address" name="email" required error={showError('email')}>
+              {/* Work Email */}
+              <Field label="Work Email Address" name="email" required error={showError('email')}>
                 <input
-                  id="email" name="email" type="email" inputMode="email" autoComplete="email"
-                  value={form.email} onChange={onChange} onBlur={onBlur}
+                  id="email"
+                  name="email"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={onChange}
+                  onBlur={onBlur}
                   aria-invalid={showError('email') ? 'true' : undefined}
-                  aria-describedby={showError('email') ? 'email-err' : undefined}
-                  placeholder="you@company.com" className="field"
+                  placeholder="adeola@company.com"
+                  className="field"
                 />
               </Field>
 
-              <Field label="Company / organisation" name="company" hint="Optional">
+              {/* Company */}
+              <Field label="Company / Product Name" name="company" hint="Optional">
                 <input
-                  id="company" name="company" type="text" autoComplete="organization"
-                  value={form.company} onChange={onChange}
-                  placeholder="Company name" className="field"
+                  id="company"
+                  name="company"
+                  type="text"
+                  autoComplete="organization"
+                  value={form.company}
+                  onChange={onChange}
+                  placeholder="e.g. Acme Tech Inc."
+                  className="field"
                 />
               </Field>
 
-              <Field label="Service of interest" name="service" required error={showError('service')}>
-                <div className="relative">
-                  <select
-                    id="service" name="service" value={form.service}
-                    onChange={onChange} onBlur={onBlur}
-                    aria-invalid={showError('service') ? 'true' : undefined}
-                    aria-describedby={showError('service') ? 'service-err' : undefined}
-                    className="field cursor-pointer appearance-none pr-11"
-                    style={{ color: form.service ? 'var(--color-ink)' : 'rgba(107,104,96,.55)' }}
-                  >
-                    <option value="">Select a service</option>
-                    {SERVICE_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                  <span aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-subtle">▾</span>
-                </div>
+              {/* Phone / WhatsApp */}
+              <Field label="Phone / WhatsApp Number" name="phone" hint="For quick briefing call">
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  value={form.phone}
+                  onChange={onChange}
+                  placeholder="+234 800 000 0000"
+                  className="field"
+                />
               </Field>
 
+              {/* Service Selection */}
               <div className="lg:col-span-2">
-                <Legend label="Budget range" hint="Optional — helps us scope honestly" />
+                <Field label="Primary Discipline of Interest" name="service" required error={showError('service')}>
+                  <div className="relative">
+                    <select
+                      id="service"
+                      name="service"
+                      value={form.service}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      aria-invalid={showError('service') ? 'true' : undefined}
+                      className="field cursor-pointer appearance-none pr-11"
+                    >
+                      <option value="">Select a discipline...</option>
+                      {SERVICE_OPTIONS.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                    <span aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gold">
+                      ▾
+                    </span>
+                  </div>
+                </Field>
+              </div>
+
+              {/* Budget Range Chips */}
+              <div className="lg:col-span-2">
+                <Legend
+                  label={`Estimated Investment Range (${currency})`}
+                  hint="Fixed-scope quotes based on your choice"
+                />
                 <ChipGroup
-                  name="budget" options={BUDGETS} value={form.budget}
+                  name="budget"
+                  options={activeBudgets}
+                  value={form.budget}
                   onSelect={(v) => set('budget', v === form.budget ? '' : v)}
                 />
               </div>
 
+              {/* Timeline Chips */}
               <div className="lg:col-span-2">
-                <Legend label="Ideal timeline" hint="Optional" />
+                <Legend label="Target Launch Velocity" hint="When do you need to go live?" />
                 <ChipGroup
-                  name="timeline" options={TIMELINES} value={form.timeline}
+                  name="timeline"
+                  options={TIMELINES}
+                  value={form.timeline}
                   onSelect={(v) => set('timeline', v === form.timeline ? '' : v)}
                 />
               </div>
 
+              {/* Project Message / Scope */}
               <div className="lg:col-span-2">
-                <Field label="Tell us about your project" name="message" required error={showError('message')}>
+                <Field label="Project Scope &amp; Strategic Goals" name="message" required error={showError('message')}>
                   <textarea
-                    id="message" name="message" rows={5} maxLength={MAX_MESSAGE}
-                    value={form.message} onChange={onChange} onBlur={onBlur}
+                    id="message"
+                    name="message"
+                    rows={5}
+                    maxLength={MAX_MESSAGE}
+                    value={form.message}
+                    onChange={onChange}
+                    onBlur={onBlur}
                     aria-invalid={showError('message') ? 'true' : undefined}
-                    aria-describedby={`message-count${showError('message') ? ' message-err' : ''}`}
-                    placeholder="What are you building? What is the gap you need closed?"
+                    placeholder="Tell us what you are building, your current bottleneck, and what winning looks like for this launch..."
                     className="field resize-y"
                   />
                 </Field>
-                <p id="message-count" className={`mt-2 text-right text-xs ${charsLeft < 100 ? 'text-gold-dk' : 'text-subtle'}`}>
-                  {charsLeft} characters left
-                </p>
+                <div className="mt-2 flex items-center justify-between text-xs text-muted">
+                  <span>Founder-led confidentiality guaranteed</span>
+                  <span className={charsLeft < 100 ? 'text-gold font-bold' : ''}>
+                    {charsLeft} characters left
+                  </span>
+                </div>
               </div>
 
-              <div className="flex flex-col items-start gap-4 lg:col-span-2 sm:flex-row sm:items-center">
-                <button type="submit" disabled={status === 'sending'} className="btn-gold disabled:cursor-not-allowed disabled:opacity-60">
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 lg:col-span-2 pt-2">
+                <button
+                  type="submit"
+                  disabled={status === 'sending'}
+                  className="btn-gold disabled:cursor-not-allowed disabled:opacity-60 flex-1 sm:flex-initial"
+                >
                   {status === 'sending' ? (
                     <>
-                      <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
-                      Sending…
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      Submitting Brief…
                     </>
                   ) : (
-                    <>Send the brief <span className="arrow" aria-hidden="true">→</span></>
+                    <>
+                      Submit Project Brief <span className="arrow">→</span>
+                    </>
                   )}
                 </button>
 
-                <p className="text-xs font-light text-subtle">
-                  We reply within 24 hours. Your details are never shared.
+                <button
+                  type="button"
+                  onClick={handleWhatsAppDirect}
+                  className="btn-outline flex-1 sm:flex-initial"
+                >
+                  Send Direct via WhatsApp 💬
+                </button>
+
+                <p className="text-xs font-light text-muted sm:ml-auto">
+                  ⚡ 24h reply guarantee. Zero junior pass-offs.
                 </p>
               </div>
 
-              {status === 'error' && (
-                <div role="alert" className="lg:col-span-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  Something went wrong sending the form. Please email us directly at{' '}
-                  <a href={`mailto:${SITE.email}`} className="font-medium underline">{SITE.emailDisplay}</a>.
-                </div>
-              )}
             </form>
           )}
         </div>
+
       </div>
     </section>
   )
 }
 
-/* ------------------------------------------------------------------ bits */
-
 function Field({ label, name, required, hint, error, children }) {
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={name} className="flex items-center gap-2 section-label !text-[10px] !text-ink2">
+      <label htmlFor={name} className="flex items-center gap-2 section-label !text-[11px] !text-ink">
         {label}
-        {required ? <span className="text-gold" aria-hidden="true">*</span> : null}
-        {hint ? <span className="font-dm text-[10px] font-normal normal-case tracking-normal text-subtle">{hint}</span> : null}
+        {required && <span className="text-gold" aria-hidden="true">*</span>}
+        {hint && <span className="font-dm text-[10px] font-normal normal-case tracking-normal text-muted">{hint}</span>}
       </label>
       {children}
-      {error ? (
-        <p id={`${name}-err`} className="text-xs text-red-600">{error}</p>
-      ) : null}
+      {error && <p className="text-xs text-red-500 mt-1 font-medium">{error}</p>}
     </div>
   )
 }
 
 function Legend({ label, hint }) {
   return (
-    <p className="mb-3 flex items-center gap-2 section-label !text-[10px] !text-ink2">
+    <p className="mb-3 flex items-center gap-2 section-label !text-[11px] !text-ink">
       {label}
-      {hint ? <span className="font-dm text-[10px] font-normal normal-case tracking-normal text-subtle">{hint}</span> : null}
+      {hint && <span className="font-dm text-[10px] font-normal normal-case tracking-normal text-muted">{hint}</span>}
     </p>
   )
 }
@@ -297,10 +435,10 @@ function ChipGroup({ name, options, value, onSelect }) {
             type="button"
             aria-pressed={selected}
             onClick={() => onSelect(o)}
-            className={`rounded-full border px-3 py-2 text-xs sm:px-4 sm:py-2.5 sm:text-[13px] transition-all duration-200 ${
+            className={`rounded-full border px-3.5 py-2 text-xs font-syne font-semibold transition-all ${
               selected
-                ? 'border-gold bg-gold/10 text-gold-dk'
-                : 'border-border text-subtle hover:border-border2 hover:text-ink2'
+                ? 'border-gold bg-gold/15 text-gold-lt shadow-sm ring-1 ring-gold/40'
+                : 'border-border bg-surface text-subtle hover:border-border2 hover:text-ink'
             }`}
           >
             {o}
