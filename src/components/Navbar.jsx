@@ -132,13 +132,13 @@ export default function Navbar() {
         <Link
           to="/"
           className="shrink-0 transition-opacity hover:opacity-80"
-          aria-label="T.O.P — Top One Percent Home"
+          aria-label="T.O.P (Top One Percent) Home"
         >
           <Wordmark className="text-2xl sm:text-3xl" />
         </Link>
 
         {/* Desktop section links */}
-        <ul className="hidden items-center gap-1 rounded-full border border-border/80 bg-secondary/60 p-1.5 backdrop-blur-md xl:flex">
+        <ul className="hidden items-center gap-1 rounded-xl border border-border/80 bg-secondary/60 p-1.5 backdrop-blur-md xl:flex">
           {NAV_LINKS.map((l) => {
             const isActive = active === l.id
             return (
@@ -147,7 +147,7 @@ export default function Navbar() {
                   href={l.href}
                   aria-current={isActive ? 'true' : undefined}
                   className={cn(
-                    'relative block rounded-full px-3.5 py-1.5 font-syne text-xs font-semibold tracking-wide transition-colors duration-200',
+                    'relative block rounded-lg px-3.5 py-1.5 font-syne text-xs font-semibold tracking-wide transition-colors duration-200',
                     isActive ? 'bg-gold text-[#0E0C08] shadow-sm' : 'text-muted-foreground hover:text-foreground'
                   )}
                 >

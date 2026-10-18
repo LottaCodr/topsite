@@ -166,7 +166,7 @@ export default function Hero() {
             style={{ maxWidth: '48ch', ...step(2) }}
           >
             Top One Percent is an elite tech and media company in Abuja. We engineer brand systems,
-            full-stack AI applications, and kinetic motion — four disciplines, zero junior handoffs,
+            full-stack AI applications, and kinetic motion: four disciplines, zero junior handoffs,
             one uncompromising standard.
           </p>
 
@@ -191,7 +191,7 @@ export default function Hero() {
             </Button>
           </div>
 
-          {/* Trust strip — social proof directly under the hero CTAs (UX research F2) */}
+          {/* Trust strip: social proof directly under the hero CTAs (UX research F2) */}
           <div
             className="mt-10 grid max-w-xl grid-cols-2 gap-x-6 gap-y-5 rounded-2xl border border-border bg-card/60 p-5 backdrop-blur-sm sm:grid-cols-4"
             style={step(4)}
@@ -269,7 +269,7 @@ export default function Hero() {
 
             {/* Live badge */}
             <div className="absolute -top-4 right-4 sm:-top-5 sm:right-6">
-              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 shadow-lg backdrop-blur-md">
+              <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-1.5 shadow-lg backdrop-blur-md">
                 <span className="h-2 w-2 animate-pulse-slow rounded-full bg-gold" aria-hidden="true" />
                 <span className="font-syne text-xs font-bold text-gold">3 Flagship Products Live</span>
               </div>

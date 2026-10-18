@@ -443,7 +443,7 @@ function ChipGroup({ name, options, value, onSelect }) {
             aria-pressed={selected}
             onClick={() => onSelect(o)}
             className={cn(
-              'cursor-pointer rounded-full border px-3.5 py-2 font-syne text-xs font-semibold transition-all outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
+              'cursor-pointer rounded-lg border px-3.5 py-2 font-syne text-xs font-semibold transition-all outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
               selected
                 ? 'border-gold bg-gold/15 text-gold shadow-sm ring-1 ring-gold/40'
                 : 'border-border bg-card text-muted-foreground hover:border-gold/40 hover:text-foreground'

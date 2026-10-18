@@ -151,7 +151,7 @@ export default function Services() {
           </div>
           <p className="max-w-md text-base font-light leading-relaxed text-muted-foreground">
             Every engagement is staffed exclusively by senior architects and designers.
-            Transparent starting benchmarks in both currencies — no retainers, no billable-hour games.
+            Transparent starting benchmarks in both currencies: no retainers, no billable-hour games.
           </p>
         </div>
 

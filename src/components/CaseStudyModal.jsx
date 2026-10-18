@@ -115,7 +115,7 @@ export default function CaseStudyModal() {
                   </span>
                 </div>
                 <span
-                  className="relative rounded-full border px-4 py-1 font-syne text-xs uppercase tracking-widest"
+                  className="relative rounded-md border px-4 py-1 font-syne text-xs uppercase tracking-widest"
                   style={{
                     borderColor: `${activeCaseStudy.accentColor}50`,
                     color: activeCaseStudy.accentColor,

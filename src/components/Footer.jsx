@@ -76,8 +76,8 @@ export default function Footer() {
                       href={s.href}
                       target="_blank"
                       rel="noreferrer noopener"
-                      title={`${s.label} — ${s.handle}`}
-                      className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-xs transition-colors hover:border-gold/50 hover:text-gold-lt"
+                      title={`${s.label}: ${s.handle}`}
+                      className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3.5 py-2 text-xs transition-colors hover:border-gold/50 hover:text-gold-lt"
                     >
                       <Icon className="size-3.5" />
                       {s.label}
@@ -128,7 +128,7 @@ export default function Footer() {
                         toggleTheme()
                         playSound('click')
                       }}
-                      className="cursor-pointer rounded-full border border-white/15 bg-white/5 px-3 py-1 font-syne text-xs font-bold text-gold-lt transition-colors hover:border-gold/50"
+                      className="cursor-pointer rounded-md border border-white/15 bg-white/5 px-3 py-1 font-syne text-xs font-bold text-gold-lt transition-colors hover:border-gold/50"
                       aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
                     >
                       Switch
@@ -146,7 +146,7 @@ export default function Footer() {
                     toggleCurrency()
                     playSound('click')
                   }}
-                  className="cursor-pointer rounded-full border border-white/15 bg-white/5 px-3 py-1 font-syne text-xs font-bold text-gold-lt transition-colors hover:border-gold/50"
+                  className="cursor-pointer rounded-md border border-white/15 bg-white/5 px-3 py-1 font-syne text-xs font-bold text-gold-lt transition-colors hover:border-gold/50"
                   aria-label="Toggle display currency"
                 >
                   {currency === 'NGN' ? '₦ NGN' : '$ USD'}

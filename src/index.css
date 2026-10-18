@@ -323,7 +323,7 @@ html.light {
   }
   .skip-link:focus { top: 1.25rem; }
 
-  /* Legacy buttons — retained for /card page compatibility */
+  /* Legacy buttons, retained for /card page compatibility */
   .btn-gold {
     display: inline-flex;
     align-items: center;

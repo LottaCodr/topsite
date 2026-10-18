@@ -239,7 +239,7 @@ export const COMPARISON = [
   },
   {
     feature: 'Design & Code Synergy',
-    top: 'Seamless unison — designers who code, engineers with taste',
+    top: 'Seamless unison: designers who code, engineers with taste',
     agency: 'Design team fights with engineering handoff',
     freelance: 'Either only design or only backend code',
     consultancy: 'Outsourced engineering to overseas sub-contractors',
@@ -260,7 +260,7 @@ export const COMPARISON = [
   },
   {
     feature: 'Intellectual Property',
-    top: '100% IP Transfer — you own all code, repos & vector files',
+    top: '100% IP Transfer: you own all code, repos & vector files',
     agency: 'Proprietary locks or licensing fees to extract files',
     freelance: 'Disorganized source files with zero documentation',
     consultancy: 'Complex legal lock-in on proprietary frameworks',
@@ -500,10 +500,10 @@ export const FOOTER_LINKS = {
     { label: 'Design Systems & Strategy', href: '#services' },
   ],
   Products: [
-    { label: 'Glimms — AI Styling', href: '#work' },
-    { label: 'nēro — Sovereign Fintech', href: '#work' },
-    { label: 'Nile Valley EMR — Health OS', href: '#work' },
-    { label: 'Vespera — Kinetic Luxury', href: '#work' },
+    { label: 'Glimms: AI Styling', href: '#work' },
+    { label: 'nēro: Sovereign Fintech', href: '#work' },
+    { label: 'Nile Valley EMR: Health OS', href: '#work' },
+    { label: 'Vespera: Kinetic Luxury', href: '#work' },
   ],
   Agency: [
     { label: 'Interactive Scope Calculator', href: '#calculator' },

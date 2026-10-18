@@ -9,7 +9,7 @@ const PILLARS = [
   {
     icon: Users,
     title: 'Senior-only, by policy',
-    desc: 'Every line of code and every vector is produced by senior architects. We do not staff juniors on client work — ever.',
+    desc: 'Every line of code and every vector is produced by senior architects. We do not staff juniors on client work, ever.',
   },
   {
     icon: ShieldCheck,
@@ -42,7 +42,7 @@ export default function About() {
               <p>
                 {SITE.pitch} T.O.P was founded in {SITE.founded} by {SITE.founder.name} to prove
                 that world-class product engineering and brand architecture could ship from
-                Nigeria — faster, sharper, and more transparent than any agency in London or
+                Nigeria: faster, sharper, and more transparent than any agency in London or
                 San Francisco.
               </p>
               <p>

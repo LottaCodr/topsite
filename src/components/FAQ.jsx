@@ -45,7 +45,7 @@ export default function FAQ() {
               Questions, <span className="text-gold">answered.</span>
             </h2>
             <p className="mb-6 max-w-sm text-sm font-light leading-relaxed text-muted-foreground">
-              Pricing, process, ownership, and payments — the things agencies usually
+              Pricing, process, ownership, and payments: the things agencies usually
               hide in fine print. We put them on the page.
             </p>
             <Button asChild variant="outline">
@@ -65,7 +65,7 @@ export default function FAQ() {
                 <Input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search questions — pricing, IP, timelines…"
+                  placeholder="Search questions: pricing, IP, timelines…"
                   aria-label="Search frequently asked questions"
                   className="pl-10"
                 />
@@ -110,7 +110,7 @@ export default function FAQ() {
               <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
                 <p className="mb-2 font-syne font-bold text-foreground">No matching questions.</p>
                 <p className="mb-5 text-sm text-muted-foreground">
-                  We reply to every direct inquiry in under 24 hours — ask us anything.
+                  We reply to every direct inquiry in under 24 hours. Ask us anything.
                 </p>
                 <Button asChild size="sm">
                   <a href={`mailto:${SITE.email}`}>Email the Studio</a>

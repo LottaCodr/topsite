@@ -101,7 +101,7 @@ export default function Work() {
                           </span>
                         </div>
                         <span
-                          className="relative mt-4 rounded-full border px-3.5 py-1 font-syne text-xs uppercase tracking-widest"
+                          className="relative mt-4 rounded-md border px-3.5 py-1 font-syne text-xs uppercase tracking-widest"
                           style={{
                             borderColor: `${p.accentColor}40`,
                             color: p.accentColor,
