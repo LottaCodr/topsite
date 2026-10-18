@@ -7,23 +7,41 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "smoke": "esbuild scripts/smoke.jsx --bundle --platform=node --format=cjs --jsx=automatic --external:jsdom --outfile=scripts/.smoke.cjs --log-level=error && node scripts/.smoke.cjs && rm -f scripts/.smoke.cjs"
   },
   "dependencies": {
+    "@radix-ui/react-accordion": "^1.3.1",
+    "@radix-ui/react-checkbox": "^1.4.1",
+    "@radix-ui/react-dialog": "^1.3.1",
+    "@radix-ui/react-dropdown-menu": "^2.2.1",
+    "@radix-ui/react-label": "^2.1.17",
+    "@radix-ui/react-progress": "^1.2.1",
+    "@radix-ui/react-separator": "^1.2.0",
+    "@radix-ui/react-slot": "^1.5.0",
+    "@radix-ui/react-switch": "^1.4.1",
+    "@radix-ui/react-tabs": "^1.2.1",
+    "@radix-ui/react-tooltip": "^1.4.1",
     "@tailwindcss/vite": "^4.3.3",
     "canvas-confetti": "^1.9.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "lucide-react": "^1.33.0",
     "qrcode": "^1.5.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",
-    "tailwindcss": "^4.3.3"
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^4.3.3",
+    "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
+    "esbuild": "^0.28.2",
+    "jsdom": "^30.1.3",
     "oxlint": "^1.71.0",
     "vite": "^8.1.1"
   }

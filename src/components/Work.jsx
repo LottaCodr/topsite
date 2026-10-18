@@ -1,7 +1,12 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { ArrowRight, MessageCircle } from 'lucide-react'
 import { useReveal } from '../hooks/useReveal.js'
 import { PROJECTS } from '../data/site.js'
 import { useApp } from '../hooks/useApp.js'
+import { Badge } from './ui/badge.jsx'
+import { Button } from './ui/button.jsx'
+import { Card } from './ui/card.jsx'
+import { Tabs, TabsList, TabsTrigger } from './ui/tabs.jsx'
 
 const CATEGORIES = ['All Products', 'AI & Mobile', 'Fintech & Mobile', 'Healthcare & Web OS', 'Brand & Motion']
 
@@ -12,61 +17,58 @@ export default function Work() {
 
   const filteredProjects = useMemo(() => {
     if (activeCategory === 'All Products') return PROJECTS
-    return PROJECTS.filter((p) => p.category.toLowerCase().includes(activeCategory.split(' ')[0].toLowerCase()))
+    return PROJECTS.filter((p) =>
+      p.category.toLowerCase().includes(activeCategory.split(' ')[0].toLowerCase())
+    )
   }, [activeCategory])
 
   return (
-    <section id="work" ref={ref} className="scroll-mt-24 bg-surface2 py-24 lg:py-32 border-b border-border">
+    <section id="work" ref={ref} className="scroll-mt-24 border-b border-border bg-secondary/30 py-24 lg:py-32">
       <div className="container-page">
-
-        {/* Section Header */}
+        {/* Header */}
         <header className="mb-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="reveal">
             <p className="section-label mb-4">Selected Flagships</p>
-            <h2 className="display text-ink" style={{ fontSize: 'clamp(30px,4.6vw,52px)' }}>
-              Products we have<br /><span className="text-gold">engineered &amp; launched.</span>
+            <h2 className="display text-foreground" style={{ fontSize: 'clamp(30px,4.6vw,52px)' }}>
+              Products we have
+              <br />
+              <span className="text-gold">engineered &amp; launched.</span>
             </h2>
           </div>
           <div className="reveal max-w-md">
-            <p className="text-base font-light leading-relaxed text-subtle">
+            <p className="text-base font-light leading-relaxed text-muted-foreground">
               Engineered, designed, and deployed in-house and for client partners.
               Real software live in production with measurable business metrics.
             </p>
           </div>
         </header>
 
-        {/* Category Filter Pills */}
-        <div className="reveal mb-12 flex flex-wrap items-center gap-2">
-          {CATEGORIES.map((cat) => {
-            const isActive = activeCategory === cat
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => {
-                  setActiveCategory(cat)
-                  playSound('click')
-                }}
-                className={`rounded-full px-4 py-2 font-syne text-xs font-bold transition-all ${
-                  isActive
-                    ? 'bg-gold text-obsidian shadow-md'
-                    : 'border border-border bg-surface text-subtle hover:border-border2 hover:text-ink'
-                }`}
-              >
+        {/* Category filter (Radix Tabs) */}
+        <Tabs
+          value={activeCategory}
+          onValueChange={(v) => {
+            setActiveCategory(v)
+            playSound('click')
+          }}
+          className="reveal mb-12 gap-0"
+          aria-label="Filter projects by category"
+        >
+          <TabsList className="flex-wrap justify-start">
+            {CATEGORIES.map((cat) => (
+              <TabsTrigger key={cat} value={cat}>
                 {cat}
-              </button>
-            )
-          })}
-        </div>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
-        {/* Projects List */}
+        {/* Projects */}
         <ol className="flex flex-col gap-8">
           {filteredProjects.map((p, i) => (
             <li key={p.id} className="reveal">
-              <article className="card-base card-hover group relative overflow-hidden bg-surface">
+              <Card className="group relative overflow-hidden border-border py-0 transition-all duration-300 hover:border-gold/40 hover:shadow-[0_28px_72px_-16px_rgba(184,146,74,0.15)]">
                 <div className="grid gap-0 lg:grid-cols-12">
-
-                  {/* Left Visual Panel */}
+                  {/* Visual */}
                   <div className="relative h-64 overflow-hidden sm:h-72 lg:col-span-5 lg:h-auto lg:min-h-[340px]">
                     {p.image ? (
                       <img
@@ -77,13 +79,9 @@ export default function Work() {
                       />
                     ) : (
                       <div
-                        className="relative flex h-full flex-col items-center justify-center p-8 overflow-hidden"
+                        className="noise relative flex h-full flex-col items-center justify-center overflow-hidden p-8"
                         style={{ background: p.gradient || '#111' }}
                       >
-                        <div
-                          aria-hidden="true"
-                          className="pointer-events-none absolute inset-0 opacity-40 noise"
-                        />
                         <div
                           aria-hidden="true"
                           className="pointer-events-none absolute inset-0"
@@ -98,10 +96,7 @@ export default function Work() {
                             background: `${p.accentColor}20`,
                           }}
                         >
-                          <span
-                            className="font-syne text-4xl font-extrabold"
-                            style={{ color: p.accentColor }}
-                          >
+                          <span className="font-syne text-4xl font-extrabold" style={{ color: p.accentColor }}>
                             {p.icon}
                           </span>
                         </div>
@@ -118,128 +113,119 @@ export default function Work() {
                       </div>
                     )}
 
-                    {/* Edge fade gradients */}
+                    {/* Edge fades */}
                     <div
                       aria-hidden="true"
-                      className="absolute inset-y-0 right-0 hidden w-16 lg:block pointer-events-none"
-                      style={{ background: 'linear-gradient(to right, transparent, var(--bg-surface))' }}
+                      className="pointer-events-none absolute inset-y-0 right-0 hidden w-16 lg:block"
+                      style={{ background: 'linear-gradient(to right, transparent, var(--card))' }}
                     />
                     <div
                       aria-hidden="true"
-                      className="absolute inset-x-0 bottom-0 h-12 lg:hidden pointer-events-none"
-                      style={{ background: 'linear-gradient(to top, var(--bg-surface), transparent)' }}
+                      className="pointer-events-none absolute inset-x-0 bottom-0 h-12 lg:hidden"
+                      style={{ background: 'linear-gradient(to top, var(--card), transparent)' }}
                     />
                   </div>
 
-                  {/* Right Content Panel */}
+                  {/* Content */}
                   <div className="flex flex-col justify-between p-6 sm:p-8 lg:col-span-7 lg:p-10">
                     <div>
-                      {/* Status & Category */}
                       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="gap-2">
                           <span
-                            className="h-2 w-2 rounded-full animate-pulse-slow"
+                            className="h-2 w-2 animate-pulse-slow rounded-full"
                             style={{ background: p.dot }}
                             aria-hidden="true"
                           />
-                          <span className="text-xs uppercase tracking-widest text-subtle font-semibold">
-                            {p.badge}
-                          </span>
-                        </div>
-                        <span className="rounded-full border border-border px-3 py-0.5 text-xs text-muted">
+                          <span className="text-foreground">{p.badge}</span>
+                        </Badge>
+                        <Badge variant="secondary" className="font-dm normal-case tracking-normal">
                           {p.timeline} · {p.year}
-                        </span>
+                        </Badge>
                       </div>
 
-                      {/* Title & Subtitle */}
                       <h3
-                        className="display mb-1 text-ink transition-colors duration-300 group-hover:text-gold"
+                        className="display mb-1 text-foreground transition-colors duration-300 group-hover:text-gold"
                         style={{ fontSize: 'clamp(26px, 3.2vw, 38px)' }}
                       >
                         {p.name}
                       </h3>
-                      <p className="font-syne text-sm font-semibold text-gold mb-4">
-                        {p.subtitle}
-                      </p>
-
-                      <p className="mb-6 text-sm sm:text-base font-light leading-relaxed text-ink2">
+                      <p className="mb-4 font-syne text-sm font-semibold text-gold">{p.subtitle}</p>
+                      <p className="mb-6 text-sm font-light leading-relaxed text-foreground/85 sm:text-base">
                         {p.summary}
                       </p>
 
-                      {/* Key Performance Metrics */}
-                      <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3 border-y border-border py-4 bg-surface2/40 rounded-xl px-3">
+                      {/* Metrics */}
+                      <div className="mb-6 grid grid-cols-2 gap-3 rounded-xl border border-border bg-secondary/40 px-4 py-4 sm:grid-cols-4">
                         {p.metrics.map((m) => (
                           <div key={m.label}>
-                            <div className="font-syne text-base sm:text-lg font-extrabold text-gold">
+                            <div className="font-syne text-base font-extrabold text-gold sm:text-lg">
                               {m.value}
                             </div>
-                            <div className="mt-0.5 text-[10px] sm:text-[11px] leading-tight text-muted">
+                            <div className="mt-0.5 text-[10px] leading-tight text-muted-foreground sm:text-[11px]">
                               {m.label}
                             </div>
                           </div>
                         ))}
                       </div>
 
-                      {/* Tech Stack Pills */}
+                      {/* Stack */}
                       <ul className="mb-6 flex flex-wrap gap-2">
                         {p.stack.map((s) => (
-                          <li
-                            key={s}
-                            className="rounded-full border border-border bg-surface2 px-3 py-1 text-xs text-subtle transition-colors group-hover:border-gold/40"
-                          >
-                            {s}
+                          <li key={s}>
+                            <Badge variant="secondary" className="font-dm text-[11px] font-medium normal-case tracking-normal">
+                              {s}
+                            </Badge>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    {/* Bottom CTA to Open Case Study Modal */}
                     <div className="flex items-center justify-between pt-2">
-                      <button
-                        type="button"
-                        onClick={() => openCaseStudy(p.id)}
-                        className="btn-gold !py-2.5 !px-5 !text-xs"
-                      >
-                        View Full Case Study <span className="arrow">→</span>
-                      </button>
-
-                      <span className="text-xs text-muted">
+                      <Button size="sm" onClick={() => openCaseStudy(p.id)} className="px-5">
+                        View Full Case Study
+                        <ArrowRight />
+                      </Button>
+                      <span className="text-xs text-muted-foreground">
                         {i + 1} of {PROJECTS.length}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Bottom accent glow bar */}
+                {/* Hover accent bar */}
                 <span
                   aria-hidden="true"
                   className="pointer-events-none absolute bottom-0 left-0 h-[2px] w-full origin-left scale-x-0 bg-gradient-to-r from-gold via-gold-lt to-transparent transition-transform duration-700 group-hover:scale-x-100"
                 />
-              </article>
+              </Card>
             </li>
           ))}
         </ol>
 
-        {/* Portfolio Conversation Banner */}
-        <div className="reveal mt-14 flex flex-col items-center gap-4 text-center rounded-2xl border border-border bg-surface p-8">
-          <p className="text-sm font-light text-subtle max-w-xl">
+        {/* Private portfolio banner */}
+        <div className="reveal mt-14 flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8 text-center">
+          <p className="max-w-xl text-sm font-light text-muted-foreground">
             Want to see private enterprise case studies, architectural blueprints, or client references?
           </p>
-          <div className="flex flex-wrap items-center gap-3">
-            <a href="#contact" className="btn-outline">
-              Request Private Portfolio Access <span className="arrow">→</span>
-            </a>
-            <a
-              href="https://wa.me/2349135775141?text=Hi%20Lotanna,%20I'd%20like%20to%20view%20the%20T.O.P%20portfolio%20and%20discuss%20a%20project."
-              target="_blank"
-              rel="noreferrer noopener"
-              className="btn-ghost-dark"
-            >
-              Direct WhatsApp Query 💬
-            </a>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button asChild variant="outline">
+              <a href="#contact">
+                Request Private Portfolio Access
+                <ArrowRight />
+              </a>
+            </Button>
+            <Button asChild variant="ghost" className="text-success hover:bg-success/10 hover:text-success">
+              <a
+                href="https://wa.me/2349135775141?text=Hi%20Lotanna,%20I'd%20like%20to%20view%20the%20T.O.P%20portfolio%20and%20discuss%20a%20project."
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <MessageCircle />
+                Direct WhatsApp Query
+              </a>
+            </Button>
           </div>
         </div>
-
       </div>
     </section>
   )

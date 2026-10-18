@@ -1,156 +1,134 @@
 import { useEffect, useRef, useState } from 'react'
-import { useReveal } from '../hooks/useReveal.js'
+import { MapPin, Quote, Star } from 'lucide-react'
 import { PROOF_STATS, TESTIMONIALS } from '../data/site.js'
+import { useReveal } from '../hooks/useReveal.js'
+import { Badge } from './ui/badge.jsx'
+import { Card, CardContent } from './ui/card.jsx'
 
-const reducedMotion = () =>
-  typeof window !== 'undefined' &&
-  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-
-function useCountUp(target, suffix, started) {
-  const [value, setValue] = useState(0)
+/** Animated count-up that fires once when the stat scrolls into view. */
+function CountUp({ value, suffix }) {
+  const [display, setDisplay] = useState(0)
+  const elRef = useRef(null)
 
   useEffect(() => {
-    if (!started) return
-    const numeric = parseFloat(target)
-    if (reducedMotion() || Number.isNaN(numeric)) {
-      setValue(target)
+    const el = elRef.current
+    if (!el) return
+    const target = Number(value)
+    if (Number.isNaN(target)) {
+      setDisplay(value)
       return
     }
-    let raf
-    const t0 = performance.now()
-    const dur = 1200
-    const tick = (now) => {
-      const p = Math.min(1, (now - t0) / dur)
-      const eased = 1 - Math.pow(1 - p, 3)
-      setValue(Math.round(numeric * eased))
-      if (p < 1) raf = requestAnimationFrame(tick)
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setDisplay(target)
+      return
     }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [started, target])
 
-  return `${value}${suffix}`
-}
+    let raf = null
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting) return
+        io.disconnect()
+        const start = performance.now()
+        const dur = 1200
+        const tick = (now) => {
+          const t = Math.min(1, (now - start) / dur)
+          const eased = 1 - Math.pow(1 - t, 3)
+          setDisplay(Math.round(eased * target))
+          if (t < 1) raf = requestAnimationFrame(tick)
+        }
+        raf = requestAnimationFrame(tick)
+      },
+      { threshold: 0.4 }
+    )
+    io.observe(el)
+    return () => {
+      io.disconnect()
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [value])
 
-function Stat({ value, suffix, label, sub, started }) {
-  const v = useCountUp(value, suffix, started)
   return (
-    <div className="card-base p-6 transition-all hover:border-gold/50">
-      <div className="font-syne text-3xl sm:text-4xl font-extrabold tracking-tight text-gold">
-        {v}
-      </div>
-      <div className="mt-2 text-xs sm:text-sm font-bold text-ink">
-        {label}
-      </div>
-      <div className="mt-1 text-[11px] text-muted leading-relaxed">
-        {sub}
-      </div>
-    </div>
+    <span ref={elRef}>
+      {display}
+      <span className="text-gold">{suffix}</span>
+    </span>
   )
 }
 
 export default function Proof() {
   const ref = useReveal()
-  const statsRef = useRef(null)
-  const [started, setStarted] = useState(false)
-
-  useEffect(() => {
-    const node = statsRef.current
-    if (!node || reducedMotion() || !('IntersectionObserver' in window)) {
-      setStarted(true)
-      return
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setStarted(true)
-          io.disconnect()
-        }
-      },
-      { threshold: 0.25 },
-    )
-    io.observe(node)
-    return () => io.disconnect()
-  }, [])
 
   return (
-    <section id="proof" ref={ref} aria-label="Client results and testimonials" className="scroll-mt-24 bg-surface py-24 lg:py-32 border-b border-border">
+    <section id="proof" ref={ref} className="scroll-mt-24 border-b border-border bg-secondary/30 py-24 lg:py-32">
       <div className="container-page">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+        {/* Header */}
+        <div className="reveal mb-14 max-w-2xl">
+          <p className="section-label mb-4">Verified Proof</p>
+          <h2 className="display text-foreground" style={{ fontSize: 'clamp(30px,4.6vw,52px)' }}>
+            Numbers on the board.
+            <br />
+            <span className="text-gold">Words from the room.</span>
+          </h2>
+        </div>
 
-          {/* Left Column: Metrics & Philosophy */}
-          <div className="reveal lg:col-span-5 flex flex-col justify-between">
-            <div>
-              <p className="section-label mb-4">Empirical Proof</p>
-              <h2 className="display mb-6 text-ink" style={{ fontSize: 'clamp(30px,4.2vw,48px)' }}>
-                The work speaks.<br />The metrics <span className="text-gold">confirm.</span>
-              </h2>
+        {/* Stat cards */}
+        <div className="reveal mb-16 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {PROOF_STATS.map((stat) => (
+            <Card key={stat.label} className="items-center border-border py-8 text-center">
+              <CardContent className="px-4">
+                <div className="font-syne text-4xl font-extrabold leading-none text-foreground lg:text-5xl">
+                  <CountUp value={stat.value} suffix={stat.suffix} />
+                </div>
+                <div className="mt-3 font-syne text-xs font-bold uppercase tracking-wider text-foreground">
+                  {stat.label}
+                </div>
+                <div className="mt-1 text-[11px] text-muted-foreground">{stat.sub}</div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-              <p className="mb-8 text-base font-light leading-relaxed text-subtle">
-                We prefer to be evaluated by shipped code, sub-second inference speeds,
-                and actual revenue lifted rather than vague adjectives. Here is our track
-                record across production deployments.
-              </p>
-            </div>
-
-            <div ref={statsRef} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {PROOF_STATS.map((s) => (
-                <Stat
-                  key={s.label}
-                  value={s.value}
-                  suffix={s.suffix}
-                  label={s.label}
-                  sub={s.sub}
-                  started={started}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Right Column: Verified Testimonials */}
-          <div className="flex flex-col gap-5 lg:col-span-7">
-            <p className="section-label mb-1 !text-xs">Client Voices</p>
-            {TESTIMONIALS.map((t, i) => (
-              <figure key={i} className="reveal">
-                <blockquote className="card-base card-hover flex h-full flex-col justify-between gap-5 p-6 sm:p-8 bg-surface2/60">
-                  <div className="flex items-center justify-between">
-                    <span className="font-syne text-3xl sm:text-4xl leading-none text-gold" aria-hidden="true">
-                      “
-                    </span>
-                    <span className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 font-syne text-[11px] font-bold text-gold">
-                      {t.metric}
-                    </span>
+        {/* Testimonials */}
+        <div className="grid gap-5 lg:grid-cols-3">
+          {TESTIMONIALS.map((t) => (
+            <Card key={t.name} className="reveal group border-border transition-all duration-300 hover:-translate-y-1 hover:border-gold/40">
+              <CardContent className="flex h-full flex-col px-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex gap-0.5" aria-label="5 out of 5 stars">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="size-3.5 fill-gold text-gold" />
+                    ))}
                   </div>
+                  <Quote className="size-5 text-gold/30 transition-colors group-hover:text-gold/60" />
+                </div>
 
-                  <p className="font-syne text-sm sm:text-base font-medium leading-relaxed text-ink">
-                    {t.quote}
-                  </p>
-
-                  <figcaption className="mt-2 flex items-center justify-between border-t border-border pt-4">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold/15 font-syne text-xs font-extrabold text-gold border border-gold/30"
-                        aria-hidden="true"
-                      >
-                        {t.avatar}
-                      </span>
-                      <div>
-                        <div className="font-syne text-sm font-bold text-ink">{t.name}</div>
-                        <div className="text-xs text-muted">
-                          {t.role} · <span className="text-subtle font-medium">{t.org}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <span className="hidden sm:block text-[11px] text-muted">
-                      {t.location}
-                    </span>
-                  </figcaption>
+                <blockquote className="mb-6 flex-1 text-sm font-light leading-relaxed text-foreground/90">
+                  “{t.quote}”
                 </blockquote>
-              </figure>
-            ))}
-          </div>
 
+                <Badge variant="gold" className="mb-5 self-start">{t.metric}</Badge>
+
+                <div className="flex items-center gap-3 border-t border-border pt-5">
+                  <span
+                    className="grid size-11 shrink-0 place-items-center rounded-full border border-gold/30 bg-gold/10 font-syne text-sm font-bold text-gold"
+                    aria-hidden="true"
+                  >
+                    {t.avatar}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate font-syne text-sm font-bold text-foreground">{t.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {t.role} · {t.org}
+                    </p>
+                    <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <MapPin className="size-3" />
+                      {t.location}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </section>

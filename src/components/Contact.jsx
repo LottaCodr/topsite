@@ -1,8 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import confetti from 'canvas-confetti'
+import { Check, ChevronDown, Loader2, MessageCircle, Send, Zap } from 'lucide-react'
 import { useReveal } from '../hooks/useReveal.js'
 import { SITE } from '../data/site.js'
 import { useApp } from '../hooks/useApp.js'
+import { cn } from '../lib/utils.js'
+import { Button } from './ui/button.jsx'
+import { Card, CardContent } from './ui/card.jsx'
+import { Input } from './ui/input.jsx'
+import { Label } from './ui/label.jsx'
+import { Textarea } from './ui/textarea.jsx'
 
 const SERVICE_OPTIONS = [
   'Branding & Visual Identity',
@@ -56,7 +63,7 @@ export default function Contact() {
 
   const activeBudgets = currency === 'USD' ? BUDGETS_USD : BUDGETS_NGN
 
-  // Listen to presets from Calculator, Services, or Case Studies
+  // Presets from Calculator, Services, or Case Studies
   useEffect(() => {
     if (briefPreset) {
       setForm((prev) => ({
@@ -100,12 +107,7 @@ export default function Contact() {
     e.preventDefault()
     const errs = validate(form)
     setErrors(errs)
-    setTouched({
-      name: true,
-      email: true,
-      service: true,
-      message: true,
-    })
+    setTouched({ name: true, email: true, service: true, message: true })
 
     if (Object.keys(errs).length > 0) {
       playSound('click')
@@ -115,7 +117,6 @@ export default function Contact() {
     setStatus('sending')
     playSound('open')
 
-    // Simulate reliable dispatch / submission
     try {
       await new Promise((res) => setTimeout(res, 900))
       setStatus('sent')
@@ -143,34 +144,35 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" ref={ref} className="scroll-mt-24 bg-surface py-24 lg:py-32">
+    <section id="contact" ref={ref} className="scroll-mt-24 bg-secondary/30 py-24 lg:py-32">
       <div className="container-page">
-
-        {/* Section Header */}
+        {/* Header */}
         <div className="mb-14 grid grid-cols-1 gap-8 lg:mb-16 lg:grid-cols-2 lg:gap-16">
           <div className="reveal">
             <p className="section-label mb-4">Direct Briefing</p>
-            <h2 className="display text-ink" style={{ fontSize: 'clamp(30px,4.6vw,52px)' }}>
-              Let us engineer<br />your <span className="text-gold">breakthrough.</span>
+            <h2 className="display text-foreground" style={{ fontSize: 'clamp(30px,4.6vw,52px)' }}>
+              Let us engineer
+              <br />
+              your <span className="text-gold">breakthrough.</span>
             </h2>
           </div>
 
           <div className="reveal flex flex-col justify-end gap-5">
-            <p className="text-base sm:text-lg font-light leading-relaxed text-subtle">
+            <p className="text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
               Every engagement starts with an honest brief. Tell us what you are building,
               your timeline, and where the bottleneck is. You will receive a written fixed-scope
               proposal and architectural roadmap within 24 hours.
             </p>
 
             <ul className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs sm:text-sm">
-              <li className="flex items-center gap-2 text-ink font-medium">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse-slow" aria-hidden="true" />
+              <li className="flex items-center gap-2 font-medium text-foreground">
+                <span className="h-2 w-2 animate-pulse-slow rounded-full bg-success" aria-hidden="true" />
                 <a href={`mailto:${SITE.email}`} className="text-gold underline-offset-4 hover:underline">
                   {SITE.emailDisplay}
                 </a>
               </li>
-              <li className="flex items-center gap-2 text-ink font-medium">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse-slow" aria-hidden="true" />
+              <li className="flex items-center gap-2 font-medium text-foreground">
+                <span className="h-2 w-2 animate-pulse-slow rounded-full bg-success" aria-hidden="true" />
                 <a
                   href={SITE.whatsapp}
                   target="_blank"
@@ -180,222 +182,215 @@ export default function Contact() {
                   WhatsApp Direct
                 </a>
               </li>
-              <li className="text-muted font-mono">{SITE.location} · WAT (UTC+1)</li>
+              <li className="font-mono text-muted-foreground">{SITE.location} · WAT (UTC+1)</li>
             </ul>
           </div>
         </div>
 
-        {/* Contact Form Card */}
-        <div className="reveal card-base p-6 sm:p-10 lg:p-12 shadow-2xl bg-surface2">
-          {/* Confirmation Message State */}
-          {status === 'sent' ? (
-            <div className="py-12 text-center">
-              <div className="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-3xl border border-gold/40 bg-gold/15 text-3xl text-gold shadow-lg">
-                ✓
-              </div>
-              <h3 className="mb-3 font-syne text-2xl sm:text-3xl font-bold text-ink">
-                Brief Received by Senior Team
-              </h3>
-              <p className="mx-auto mb-8 max-w-md text-sm sm:text-base font-light text-subtle leading-relaxed">
-                Thank you. Lotanna and our senior leads review every incoming brief personally.
-                Expect a response with timeline and fixed-scope options within 24 hours to{' '}
-                <strong className="text-ink">{form.email || 'your email'}</strong>.
-              </p>
-              <div className="flex flex-wrap justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setForm(EMPTY)
-                    setStatus('idle')
-                  }}
-                  className="btn-outline"
-                >
-                  Submit Another Project Brief
-                </button>
-                <a
-                  href={SITE.whatsapp}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="btn-gold"
-                >
-                  Follow up on WhatsApp 💬
-                </a>
-              </div>
-            </div>
-          ) : (
-            <form ref={formRef} onSubmit={handleSubmit} noValidate className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-
-              {/* Name */}
-              <Field label="Your Full Name" name="name" required error={showError('name')}>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  value={form.name}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  aria-invalid={showError('name') ? 'true' : undefined}
-                  placeholder="e.g. Adeola Williams"
-                  className="field"
-                />
-              </Field>
-
-              {/* Work Email */}
-              <Field label="Work Email Address" name="email" required error={showError('email')}>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  value={form.email}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  aria-invalid={showError('email') ? 'true' : undefined}
-                  placeholder="adeola@company.com"
-                  className="field"
-                />
-              </Field>
-
-              {/* Company */}
-              <Field label="Company / Product Name" name="company" hint="Optional">
-                <input
-                  id="company"
-                  name="company"
-                  type="text"
-                  autoComplete="organization"
-                  value={form.company}
-                  onChange={onChange}
-                  placeholder="e.g. Acme Tech Inc."
-                  className="field"
-                />
-              </Field>
-
-              {/* Phone / WhatsApp */}
-              <Field label="Phone / WhatsApp Number" name="phone" hint="For quick briefing call">
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  value={form.phone}
-                  onChange={onChange}
-                  placeholder="+234 800 000 0000"
-                  className="field"
-                />
-              </Field>
-
-              {/* Service Selection */}
-              <div className="lg:col-span-2">
-                <Field label="Primary Discipline of Interest" name="service" required error={showError('service')}>
-                  <div className="relative">
-                    <select
-                      id="service"
-                      name="service"
-                      value={form.service}
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      aria-invalid={showError('service') ? 'true' : undefined}
-                      className="field cursor-pointer appearance-none pr-11"
-                    >
-                      <option value="">Select a discipline...</option>
-                      {SERVICE_OPTIONS.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
-                    <span aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gold">
-                      ▾
-                    </span>
-                  </div>
-                </Field>
-              </div>
-
-              {/* Budget Range Chips */}
-              <div className="lg:col-span-2">
-                <Legend
-                  label={`Estimated Investment Range (${currency})`}
-                  hint="Fixed-scope quotes based on your choice"
-                />
-                <ChipGroup
-                  name="budget"
-                  options={activeBudgets}
-                  value={form.budget}
-                  onSelect={(v) => set('budget', v === form.budget ? '' : v)}
-                />
-              </div>
-
-              {/* Timeline Chips */}
-              <div className="lg:col-span-2">
-                <Legend label="Target Launch Velocity" hint="When do you need to go live?" />
-                <ChipGroup
-                  name="timeline"
-                  options={TIMELINES}
-                  value={form.timeline}
-                  onSelect={(v) => set('timeline', v === form.timeline ? '' : v)}
-                />
-              </div>
-
-              {/* Project Message / Scope */}
-              <div className="lg:col-span-2">
-                <Field label="Project Scope &amp; Strategic Goals" name="message" required error={showError('message')}>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={5}
-                    maxLength={MAX_MESSAGE}
-                    value={form.message}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    aria-invalid={showError('message') ? 'true' : undefined}
-                    placeholder="Tell us what you are building, your current bottleneck, and what winning looks like for this launch..."
-                    className="field resize-y"
-                  />
-                </Field>
-                <div className="mt-2 flex items-center justify-between text-xs text-muted">
-                  <span>Founder-led confidentiality guaranteed</span>
-                  <span className={charsLeft < 100 ? 'text-gold font-bold' : ''}>
-                    {charsLeft} characters left
-                  </span>
+        {/* Form card */}
+        <Card className="reveal border-border shadow-2xl">
+          <CardContent className="p-6 sm:p-10 lg:p-12">
+            {status === 'sent' ? (
+              /* Confirmation state */
+              <div className="py-12 text-center">
+                <div className="mx-auto mb-6 grid size-20 place-items-center rounded-3xl border border-gold/40 bg-gold/15 text-gold shadow-lg">
+                  <Check className="size-9" strokeWidth={2.5} />
+                </div>
+                <h3 className="mb-3 font-syne text-2xl font-bold text-foreground sm:text-3xl">
+                  Brief Received by Senior Team
+                </h3>
+                <p className="mx-auto mb-8 max-w-md text-sm font-light leading-relaxed text-muted-foreground sm:text-base">
+                  Thank you. Lotanna and our senior leads review every incoming brief personally.
+                  Expect a response with timeline and fixed-scope options within 24 hours to{' '}
+                  <strong className="text-foreground">{form.email || 'your email'}</strong>.
+                </p>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setForm(EMPTY)
+                      setStatus('idle')
+                    }}
+                  >
+                    Submit Another Project Brief
+                  </Button>
+                  <Button asChild>
+                    <a href={SITE.whatsapp} target="_blank" rel="noreferrer noopener">
+                      <MessageCircle />
+                      Follow up on WhatsApp
+                    </a>
+                  </Button>
                 </div>
               </div>
+            ) : (
+              <form ref={formRef} onSubmit={handleSubmit} noValidate className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {/* Name */}
+                <Field label="Your Full Name" name="name" required error={showError('name')}>
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    value={form.name}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    aria-invalid={showError('name') ? 'true' : undefined}
+                    placeholder="e.g. Adeola Williams"
+                  />
+                </Field>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 lg:col-span-2 pt-2">
-                <button
-                  type="submit"
-                  disabled={status === 'sending'}
-                  className="btn-gold disabled:cursor-not-allowed disabled:opacity-60 flex-1 sm:flex-initial"
-                >
-                  {status === 'sending' ? (
-                    <>
-                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      Submitting Brief…
-                    </>
-                  ) : (
-                    <>
-                      Submit Project Brief <span className="arrow">→</span>
-                    </>
-                  )}
-                </button>
+                {/* Email */}
+                <Field label="Work Email Address" name="email" required error={showError('email')}>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    value={form.email}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    aria-invalid={showError('email') ? 'true' : undefined}
+                    placeholder="adeola@company.com"
+                  />
+                </Field>
 
-                <button
-                  type="button"
-                  onClick={handleWhatsAppDirect}
-                  className="btn-outline flex-1 sm:flex-initial"
-                >
-                  Send Direct via WhatsApp 💬
-                </button>
+                {/* Company */}
+                <Field label="Company / Product Name" name="company" hint="Optional">
+                  <Input
+                    id="company"
+                    name="company"
+                    type="text"
+                    autoComplete="organization"
+                    value={form.company}
+                    onChange={onChange}
+                    placeholder="e.g. Acme Tech Inc."
+                  />
+                </Field>
 
-                <p className="text-xs font-light text-muted sm:ml-auto">
-                  ⚡ 24h reply guarantee. Zero junior pass-offs.
-                </p>
-              </div>
+                {/* Phone */}
+                <Field label="Phone / WhatsApp Number" name="phone" hint="For quick briefing call">
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    value={form.phone}
+                    onChange={onChange}
+                    placeholder="+234 800 000 0000"
+                  />
+                </Field>
 
-            </form>
-          )}
-        </div>
+                {/* Service */}
+                <div className="lg:col-span-2">
+                  <Field label="Primary Discipline of Interest" name="service" required error={showError('service')}>
+                    <div className="relative">
+                      <select
+                        id="service"
+                        name="service"
+                        value={form.service}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        aria-invalid={showError('service') ? 'true' : undefined}
+                        className="border-input dark:bg-input/30 flex h-11 w-full cursor-pointer appearance-none rounded-lg border bg-card px-3.5 py-1 pr-11 text-sm shadow-xs outline-none transition-[color,box-shadow,border-color] focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-[3px] aria-invalid:border-destructive aria-invalid:ring-destructive/25"
+                      >
+                        <option value="">Select a discipline...</option>
+                        {SERVICE_OPTIONS.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        aria-hidden="true"
+                        className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-gold"
+                      />
+                    </div>
+                  </Field>
+                </div>
 
+                {/* Budget chips */}
+                <div className="lg:col-span-2">
+                  <Legend
+                    label={`Estimated Investment Range (${currency})`}
+                    hint="Fixed-scope quotes based on your choice"
+                  />
+                  <ChipGroup
+                    name="budget"
+                    options={activeBudgets}
+                    value={form.budget}
+                    onSelect={(v) => set('budget', v === form.budget ? '' : v)}
+                  />
+                </div>
+
+                {/* Timeline chips */}
+                <div className="lg:col-span-2">
+                  <Legend label="Target Launch Velocity" hint="When do you need to go live?" />
+                  <ChipGroup
+                    name="timeline"
+                    options={TIMELINES}
+                    value={form.timeline}
+                    onSelect={(v) => set('timeline', v === form.timeline ? '' : v)}
+                  />
+                </div>
+
+                {/* Message */}
+                <div className="lg:col-span-2">
+                  <Field label="Project Scope &amp; Strategic Goals" name="message" required error={showError('message')}>
+                    <Textarea
+                      id="message"
+                      name="message"
+                      rows={5}
+                      maxLength={MAX_MESSAGE}
+                      value={form.message}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      aria-invalid={showError('message') ? 'true' : undefined}
+                      placeholder="Tell us what you are building, your current bottleneck, and what winning looks like for this launch..."
+                      className="min-h-32 resize-y"
+                    />
+                  </Field>
+                  <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Founder-led confidentiality guaranteed</span>
+                    <span className={cn(charsLeft < 100 && 'font-bold text-gold')}>
+                      {charsLeft} characters left
+                    </span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col items-stretch gap-4 pt-2 sm:flex-row sm:items-center lg:col-span-2">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    disabled={status === 'sending'}
+                    className="flex-1 sm:flex-initial"
+                  >
+                    {status === 'sending' ? (
+                      <>
+                        <Loader2 className="animate-spin" />
+                        Submitting Brief…
+                      </>
+                    ) : (
+                      <>
+                        <Send />
+                        Submit Project Brief
+                      </>
+                    )}
+                  </Button>
+
+                  <Button type="button" variant="outline" size="lg" onClick={handleWhatsAppDirect} className="flex-1 sm:flex-initial">
+                    <MessageCircle />
+                    Send via WhatsApp
+                  </Button>
+
+                  <p className="flex items-center gap-1.5 text-xs font-light text-muted-foreground sm:ml-auto">
+                    <Zap className="size-3.5 text-gold" />
+                    24h reply guarantee. Zero junior pass-offs.
+                  </p>
+                </div>
+              </form>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </section>
   )
@@ -404,22 +399,34 @@ export default function Contact() {
 function Field({ label, name, required, hint, error, children }) {
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={name} className="flex items-center gap-2 section-label !text-[11px] !text-ink">
+      <Label htmlFor={name} className="!text-[11px]">
         {label}
         {required && <span className="text-gold" aria-hidden="true">*</span>}
-        {hint && <span className="font-dm text-[10px] font-normal normal-case tracking-normal text-muted">{hint}</span>}
-      </label>
+        {hint && (
+          <span className="font-dm text-[10px] font-normal normal-case tracking-normal text-muted-foreground">
+            {hint}
+          </span>
+        )}
+      </Label>
       {children}
-      {error && <p className="text-xs text-red-500 mt-1 font-medium">{error}</p>}
+      {error && (
+        <p role="alert" className="mt-0.5 text-xs font-medium text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   )
 }
 
 function Legend({ label, hint }) {
   return (
-    <p className="mb-3 flex items-center gap-2 section-label !text-[11px] !text-ink">
+    <p className="section-label mb-3 !text-[11px] !text-foreground">
       {label}
-      {hint && <span className="font-dm text-[10px] font-normal normal-case tracking-normal text-muted">{hint}</span>}
+      {hint && (
+        <span className="font-dm text-[10px] font-normal normal-case tracking-normal text-muted-foreground">
+          {hint}
+        </span>
+      )}
     </p>
   )
 }
@@ -435,11 +442,12 @@ function ChipGroup({ name, options, value, onSelect }) {
             type="button"
             aria-pressed={selected}
             onClick={() => onSelect(o)}
-            className={`rounded-full border px-3.5 py-2 text-xs font-syne font-semibold transition-all ${
+            className={cn(
+              'cursor-pointer rounded-full border px-3.5 py-2 font-syne text-xs font-semibold transition-all outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
               selected
-                ? 'border-gold bg-gold/15 text-gold-lt shadow-sm ring-1 ring-gold/40'
-                : 'border-border bg-surface text-subtle hover:border-border2 hover:text-ink'
-            }`}
+                ? 'border-gold bg-gold/15 text-gold shadow-sm ring-1 ring-gold/40'
+                : 'border-border bg-card text-muted-foreground hover:border-gold/40 hover:text-foreground'
+            )}
           >
             {o}
           </button>

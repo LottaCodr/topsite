@@ -1,7 +1,11 @@
 # T.O.P — Top One Percent · Flagship Studio & Engineering Lab
 
 Award-winning UI/UX overhaul for **Top One Percent (T.O.P)** — an elite tech and media company headquartered in Abuja, Nigeria.
-Built with **React 19**, **Vite**, **Tailwind CSS v4**, and **React Router**.
+Built with **React 19**, **Vite**, **Tailwind CSS v4**, **React Router**, and a **shadcn/ui component system on Radix UI primitives** (Obsidian Editorial 2.0 design tokens).
+
+> 📐 The redesign is driven by documented UI/UX research — Figma Community benchmarks
+> (Untitled UI, shadcn/ui Figma Kit, Landify, Whitepace, Increasy, Positivus, Wall of Love)
+> and 2026 shadcn marketing-page patterns. See [`docs/ui-ux-research.md`](docs/ui-ux-research.md).
 
 ---
 
@@ -17,9 +21,26 @@ npm run dev
 # Production build & verification
 npm run build
 
+# Render smoke test — SSR-renders the full page through the real component tree
+npm run smoke
+
 # Code health & linting (0 warnings, 0 errors)
 npx oxlint
 ```
+
+---
+
+## 🧩 shadcn/ui + Radix Architecture
+
+- **`src/components/ui/`** — 15 shadcn-style primitives built on Radix: `button` (CVA variants),
+  `badge`, `card`, `input`, `textarea`, `label`, `separator`, `switch`, `checkbox`,
+  `dialog` + `sheet`, `dropdown-menu`, `accordion`, `tabs`, `tooltip`, `progress`.
+- **`src/lib/utils.js`** — `cn()` (clsx + tailwind-merge).
+- **`src/index.css`** — Tailwind v4 `@theme inline` token architecture (shadcn v4 style):
+  `--background/--primary/--ring/--radius…` mapped to the T.O.P brand — Obsidian Noir (dark,
+  default) & Editorial Parchment (light) with signature gold as `primary`.
+- Every dialog, menu, accordion, tab, and checkbox is now a Radix primitive: focus traps,
+  `aria-*` semantics, keyboard navigation, and scroll-lock for free.
 
 ---
 
@@ -79,6 +100,8 @@ This project has been upgraded into a category-defining flagship marketing site 
 
 ```
 src/
+  lib/
+    utils.js            cn() — clsx + tailwind-merge (shadcn standard)
   context/
     context.js          React Context definition
     AppContext.jsx      Theme, currency, audio, case studies & state provider
@@ -89,29 +112,36 @@ src/
   data/
     site.js             Single source of truth for copy, pricing, metrics & projects
   components/
-    Navbar.jsx          Sticky navbar with studio clock, currency/theme controls & mobile sheet
-    CommandPalette.jsx  ⌘K global command menu and quick actions
-    Hero.jsx            High-conviction value proposition, stats ribbon & parallax visual
+    ui/                 shadcn/ui primitives on Radix (button, badge, card, dialog,
+                        sheet, dropdown-menu, accordion, tabs, tooltip, checkbox,
+                        switch, input, textarea, label, separator, progress)
+    Navbar.jsx          Sticky blur navbar — Radix dropdowns, Sheet mobile nav, tooltips
+    CommandPalette.jsx  ⌘K Radix Dialog command menu with keyboard navigation
+    Hero.jsx            Structured split hero + trust-stat strip under the CTAs
     Marquee.jsx         Kinetic capabilities marquee
-    Services.jsx        Four core departments with deliverables checklist & pricing
-    ScopeCalculator.jsx Interactive project scope & cost estimator
-    Work.jsx            Flagship product showcase with category filtering
-    CaseStudyModal.jsx  Detailed case study deep-dive overlays
+    Services.jsx        Asymmetric bento grid of the four core departments
+    ScopeCalculator.jsx Card/Checkbox/Tabs estimator with sticky live summary
+    Work.jsx            Flagship showcase with Radix Tabs category filtering
+    CaseStudyModal.jsx  Radix Dialog case study deep-dives with prev/next
     Advantage.jsx       Comparison matrix vs traditional agencies & freelancers
     Manifesto.jsx       Full-bleed dark editorial manifesto statement
     Proof.jsx           Animated count-up stats & verified client testimonials
-    Process.jsx         4-stage engineering sprint methodology
+    Process.jsx         4-stage engineering sprint stepper
     About.jsx           Origin, principles & founder spotlight
-    FAQ.jsx             Instant searchable questions & category filters
+    FAQ.jsx             Searchable Radix Accordion with category tabs
     CTABanner.jsx       Dark obsidian CTA banner with live availability
-    Contact.jsx         Multi-option brief builder with confetti & WhatsApp export
+    Contact.jsx         Validated brief builder (shadcn form primitives) + WhatsApp export
     Footer.jsx          Footer navigation, legal metadata & preferences bar
     StickyMobileCTA.jsx Thumb-friendly mobile bottom bar
   pages/
     Home.jsx            Complete persuasion funnel sequence
     Card.jsx            /card 3D digital business card with QR & vCard
-  index.css             Tailwind v4 tokens, obsidian/parchment variables, custom scrollbars
+  index.css             shadcn v4 token architecture + Obsidian/Parchment themes
   main.jsx              React 19 entry root
+docs/
+  ui-ux-research.md     Research findings & redesign rationale
+scripts/
+  smoke.jsx             SSR render smoke test (npm run smoke)
 ```
 
 ---

@@ -1,6 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  ArrowUpRight,
+  Banknote,
+  CreditCard,
+  Mail,
+  MessageCircle,
+  Moon,
+  Search,
+  Sparkles,
+  Sun,
+  Volume2,
+  VolumeX,
+} from 'lucide-react'
 import { useApp } from '../hooks/useApp.js'
 import { PROJECTS, SITE, NAV_LINKS } from '../data/site.js'
+import { cn } from '../lib/utils.js'
+import { Badge } from './ui/badge.jsx'
+import { Dialog, DialogContent } from './ui/dialog.jsx'
 
 export default function CommandPalette() {
   const {
@@ -19,7 +35,117 @@ export default function CommandPalette() {
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const inputRef = useRef(null)
+  const listRef = useRef(null)
 
+  const actions = useMemo(
+    () => [
+      // Navigation
+      ...NAV_LINKS.map((link) => ({
+        id: `nav-${link.id}`,
+        group: 'Navigation',
+        title: `Go to ${link.label}`,
+        subtitle: `Scrolls smoothly to the #${link.id} section`,
+        icon: ArrowUpRight,
+        run: () => {
+          const el = document.getElementById(link.id)
+          if (el) el.scrollIntoView({ behavior: 'smooth' })
+          setCommandOpen(false)
+        },
+      })),
+      // Case Studies
+      ...PROJECTS.map((p) => ({
+        id: `case-${p.id}`,
+        group: 'Case Studies',
+        title: `View Case Study: ${p.name}`,
+        subtitle: `${p.subtitle} · ${p.category}`,
+        icon: Sparkles,
+        run: () => {
+          setCommandOpen(false)
+          openCaseStudy(p.id)
+        },
+      })),
+      // Preferences
+      {
+        id: 'pref-theme',
+        group: 'Preferences',
+        title: `Switch Theme to ${theme === 'dark' ? 'Editorial Light' : 'Obsidian Dark'}`,
+        subtitle: `Currently active: ${theme === 'dark' ? 'Obsidian Noir' : 'Editorial Parchment'}`,
+        icon: theme === 'dark' ? Sun : Moon,
+        run: () => {
+          toggleTheme()
+          playSound('click')
+        },
+      },
+      {
+        id: 'pref-currency',
+        group: 'Preferences',
+        title: `Switch Currency to ${currency === 'NGN' ? 'USD ($)' : 'NGN (₦)'}`,
+        subtitle: `Currently displaying prices in: ${currency}`,
+        icon: Banknote,
+        run: () => {
+          toggleCurrency()
+          playSound('click')
+        },
+      },
+      {
+        id: 'pref-sound',
+        group: 'Preferences',
+        title: `${soundEnabled ? 'Disable' : 'Enable'} Audio Micro-Haptics`,
+        subtitle: `Subtle synthesized UI sound feedback: ${soundEnabled ? 'On' : 'Off'}`,
+        icon: soundEnabled ? Volume2 : VolumeX,
+        run: () => {
+          toggleSound()
+        },
+      },
+      // Quick Connect
+      {
+        id: 'action-whatsapp',
+        group: 'Quick Connect',
+        title: 'Chat with CEO Lotanna on WhatsApp',
+        subtitle: '+234 913 577 5141 · Instant direct connection',
+        icon: MessageCircle,
+        run: () => {
+          window.open(SITE.whatsapp, '_blank', 'noreferrer,noopener')
+          setCommandOpen(false)
+        },
+      },
+      {
+        id: 'action-card',
+        group: 'Quick Connect',
+        title: 'Open Digital Business Card (/card)',
+        subtitle: 'NFC-ready card with vCard download and QR code',
+        icon: CreditCard,
+        run: () => {
+          window.location.href = '/card'
+        },
+      },
+      {
+        id: 'action-email',
+        group: 'Quick Connect',
+        title: `Send Direct Email to ${SITE.emailDisplay}`,
+        subtitle: 'Guaranteed reply in under 24 hours',
+        icon: Mail,
+        run: () => {
+          window.location.href = `mailto:${SITE.email}?subject=Project%20Inquiry%20%E2%80%94%20T.O.P`
+          setCommandOpen(false)
+        },
+      },
+    ],
+    [theme, currency, soundEnabled, openCaseStudy, playSound, setCommandOpen, toggleCurrency, toggleSound, toggleTheme]
+  )
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return actions
+    return actions.filter(
+      (a) =>
+        a.title.toLowerCase().includes(q) ||
+        a.subtitle.toLowerCase().includes(q) ||
+        a.group.toLowerCase().includes(q)
+    )
+  }, [actions, query])
+
+  // Reset state when opened
   useEffect(() => {
     if (commandOpen) {
       setQuery('')
@@ -28,220 +154,140 @@ export default function CommandPalette() {
     }
   }, [commandOpen])
 
-  if (!commandOpen) return null
+  // Keep selection within bounds
+  useEffect(() => {
+    setSelectedIndex((i) => Math.min(i, Math.max(0, filtered.length - 1)))
+  }, [filtered.length])
 
-  const actions = [
-    // Navigation
-    ...NAV_LINKS.map((link) => ({
-      id: `nav-${link.id}`,
-      group: 'Navigation',
-      title: `Go to ${link.label}`,
-      subtitle: `Scrolls smoothly to the #${link.id} section`,
-      icon: '↗',
-      run: () => {
-        const el = document.getElementById(link.id)
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
-        setCommandOpen(false)
-      },
-    })),
-    // Case Studies
-    ...PROJECTS.map((p) => ({
-      id: `case-${p.id}`,
-      group: 'Case Studies',
-      title: `View Case Study: ${p.name}`,
-      subtitle: `${p.subtitle} · ${p.category}`,
-      icon: '✦',
-      run: () => {
-        setCommandOpen(false)
-        openCaseStudy(p.id)
-      },
-    })),
-    // Preferences
-    {
-      id: 'pref-theme',
-      group: 'Preferences',
-      title: `Switch Theme to ${theme === 'dark' ? 'Editorial Light' : 'Obsidian Dark'}`,
-      subtitle: `Currently active: ${theme === 'dark' ? 'Obsidian Noir' : 'Editorial Parchment'}`,
-      icon: theme === 'dark' ? '☀️' : '🌙',
-      run: () => {
-        toggleTheme()
-        playSound('click')
-      },
-    },
-    {
-      id: 'pref-currency',
-      group: 'Preferences',
-      title: `Switch Currency to ${currency === 'NGN' ? 'USD ($)' : 'NGN (₦)'}`,
-      subtitle: `Currently displaying prices in: ${currency}`,
-      icon: currency === 'NGN' ? '$' : '₦',
-      run: () => {
-        toggleCurrency()
-        playSound('click')
-      },
-    },
-    {
-      id: 'pref-sound',
-      group: 'Preferences',
-      title: `${soundEnabled ? 'Disable' : 'Enable'} Audio Micro-Haptics`,
-      subtitle: `Subtle synthesized UI sound feedback: ${soundEnabled ? 'On' : 'Off'}`,
-      icon: soundEnabled ? '🔇' : '🔊',
-      run: () => {
-        toggleSound()
-      },
-    },
-    // Direct Actions
-    {
-      id: 'action-whatsapp',
-      group: 'Quick Connect',
-      title: 'Chat with CEO Lotanna on WhatsApp',
-      subtitle: '+234 913 577 5141 · Instant direct connection',
-      icon: '💬',
-      run: () => {
-        window.open(SITE.whatsapp, '_blank', 'noreferrer,noopener')
-        setCommandOpen(false)
-      },
-    },
-    {
-      id: 'action-card',
-      group: 'Quick Connect',
-      title: 'Open Digital Business Card (/card)',
-      subtitle: 'NFC-ready card with vCard download and QR code',
-      icon: '📇',
-      run: () => {
-        window.location.href = '/card'
-      },
-    },
-    {
-      id: 'action-email',
-      group: 'Quick Connect',
-      title: `Send Direct Email to ${SITE.emailDisplay}`,
-      subtitle: 'Guaranteed reply in under 24 hours',
-      icon: '✉',
-      run: () => {
-        window.location.href = `mailto:${SITE.email}?subject=Project%20Inquiry%20%E2%80%94%20T.O.P`
-        setCommandOpen(false)
-      },
-    },
-  ]
-
-  const filtered = actions.filter(
-    (a) =>
-      a.title.toLowerCase().includes(query.toLowerCase()) ||
-      a.subtitle.toLowerCase().includes(query.toLowerCase()) ||
-      a.group.toLowerCase().includes(query.toLowerCase())
-  )
+  const runAction = (action) => {
+    playSound('click')
+    action.run()
+  }
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Escape') {
-      setCommandOpen(false)
-    } else if (e.key === 'ArrowDown') {
+    if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setSelectedIndex((prev) => (prev + 1) % (filtered.length || 1))
+      setSelectedIndex((i) => (filtered.length ? (i + 1) % filtered.length : 0))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
-      setSelectedIndex((prev) => (prev - 1 + filtered.length) % (filtered.length || 1))
+      setSelectedIndex((i) => (filtered.length ? (i - 1 + filtered.length) % filtered.length : 0))
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      if (filtered[selectedIndex]) {
-        filtered[selectedIndex].run()
-      }
+      const action = filtered[selectedIndex]
+      if (action) runAction(action)
     }
   }
 
+  // Scroll the selected row into view
+  useEffect(() => {
+    const node = listRef.current?.querySelector(`[data-index="${selectedIndex}"]`)
+    node?.scrollIntoView({ block: 'nearest' })
+  }, [selectedIndex])
+
+  let lastGroup = ''
+
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Command Palette"
-      className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-24 bg-black/75 backdrop-blur-md"
-      onClick={() => setCommandOpen(false)}
+    <Dialog
+      open={commandOpen}
+      onOpenChange={(open) => setCommandOpen(open)}
     >
-      <div
-        className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl"
-        style={{ animation: 'fadeUp 0.25s var(--ease-out-expo) both' }}
-        onClick={(e) => e.stopPropagation()}
+      <DialogContent
+        showCloseButton={false}
+        className="top-[20%] max-w-xl translate-y-0 gap-0 overflow-hidden p-0"
+        aria-describedby={undefined}
+        onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        {/* Header / Input */}
-        <div className="flex items-center gap-3 border-b border-border px-4 py-3.5 bg-surface2">
-          <span className="text-gold font-syne font-bold text-sm">⌘K</span>
+        {/* Search input */}
+        <div className="flex items-center gap-3 border-b border-border px-5">
+          <Search className="size-4 shrink-0 text-gold" aria-hidden="true" />
           <input
             ref={inputRef}
-            type="text"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value)
               setSelectedIndex(0)
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Type a command, case study, or jump to section..."
-            className="w-full bg-transparent font-dm text-sm text-ink outline-none placeholder:text-muted"
+            placeholder="Search sections, case studies, preferences…"
+            aria-label="Command search"
+            className="h-14 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
           />
-          <button
-            onClick={() => setCommandOpen(false)}
-            className="rounded-md border border-border px-2 py-1 text-[11px] font-syne text-muted hover:text-ink"
-          >
+          <kbd className="shrink-0 rounded border border-border bg-secondary px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
             ESC
-          </button>
+          </kbd>
         </div>
 
-        {/* Results List */}
-        <div className="max-h-[60vh] overflow-y-auto p-2">
+        {/* Results */}
+        <div ref={listRef} className="max-h-[50vh] overflow-y-auto p-2" role="listbox" aria-label="Command results">
           {filtered.length === 0 ? (
-            <div className="py-10 text-center text-sm text-muted">
-              No matching commands found for &ldquo;{query}&rdquo;
+            <div className="px-4 py-10 text-center">
+              <p className="mb-1 font-syne text-sm font-bold text-foreground">No commands found.</p>
+              <p className="text-xs text-muted-foreground">
+                Try “pricing”, “case study”, “theme”, or “WhatsApp”.
+              </p>
             </div>
           ) : (
-            <ul className="flex flex-col gap-1">
-              {filtered.map((item, idx) => {
-                const isSelected = idx === selectedIndex
-                return (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      onClick={() => item.run()}
-                      onMouseEnter={() => setSelectedIndex(idx)}
-                      className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left transition-all ${
-                        isSelected
-                          ? 'bg-gold/15 text-ink border border-gold/40'
-                          : 'text-subtle hover:bg-surface2 border border-transparent'
-                      }`}
+            filtered.map((action, i) => {
+              const showGroup = action.group !== lastGroup
+              lastGroup = action.group
+              const Icon = action.icon
+              const isSelected = i === selectedIndex
+              return (
+                <div key={action.id}>
+                  {showGroup && (
+                    <p className="px-3 pt-3 pb-1.5 font-syne text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      {action.group}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    data-index={i}
+                    role="option"
+                    aria-selected={isSelected}
+                    onMouseEnter={() => setSelectedIndex(i)}
+                    onClick={() => runAction(action)}
+                    className={cn(
+                      'flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-left outline-none',
+                      isSelected ? 'bg-gold/10' : 'hover:bg-secondary/60'
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'grid size-8 shrink-0 place-items-center rounded-lg border transition-colors',
+                        isSelected ? 'border-gold/40 bg-gold/15 text-gold' : 'border-border bg-secondary/60 text-muted-foreground'
+                      )}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-border bg-surface text-sm text-gold">
-                          {item.icon}
-                        </span>
-                        <div className="min-w-0">
-                          <p className={`font-syne text-sm font-bold truncate ${isSelected ? 'text-gold-lt' : 'text-ink'}`}>
-                            {item.title}
-                          </p>
-                          <p className="truncate text-xs text-muted">
-                            {item.subtitle}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="ml-2 shrink-0 rounded border border-border px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted">
-                        {item.group}
+                      <Icon className="size-4" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className={cn('block truncate font-syne text-sm font-bold', isSelected ? 'text-gold' : 'text-foreground')}>
+                        {action.title}
                       </span>
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
+                      <span className="block truncate text-xs text-muted-foreground">{action.subtitle}</span>
+                    </span>
+                    {isSelected && (
+                      <Badge variant="gold" className="shrink-0 font-mono text-[9px]">
+                        ⏎ Enter
+                      </Badge>
+                    )}
+                  </button>
+                </div>
+              )
+            })
           )}
         </div>
 
-        {/* Footer shortcuts */}
-        <div className="flex items-center justify-between border-t border-border bg-surface2 px-4 py-2 text-[11px] text-muted">
-          <div className="flex items-center gap-3">
-            <span>↑↓ Navigate</span>
-            <span>↵ Select</span>
-            <span>ESC Close</span>
-          </div>
-          <div className="font-syne text-gold">
-            Top One Percent · {SITE.location}
-          </div>
+        {/* Footer hints */}
+        <div className="flex items-center justify-between border-t border-border bg-secondary/40 px-5 py-2.5 text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-3">
+            <span><kbd className="rounded border border-border bg-secondary px-1 font-mono">↑↓</kbd> navigate</span>
+            <span><kbd className="rounded border border-border bg-secondary px-1 font-mono">⏎</kbd> run</span>
+          </span>
+          <span className="top-wordmark text-sm">
+            T<span className="text-gold">.</span>O<span className="text-gold">.</span>P<span className="text-gold">.</span>
+          </span>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
