@@ -1,98 +1,72 @@
+import { BELIEFS } from '../data/site.js'
 import { useReveal } from '../hooks/useReveal.js'
-import { DISCIPLINES } from '../data/site.js'
-import { useApp } from '../hooks/useApp.js'
+import { Badge } from './ui/badge.jsx'
+import { Separator } from './ui/separator.jsx'
 
 export default function Manifesto() {
   const ref = useReveal()
-  const { currency, setBriefPreset, playSound } = useApp()
-
-  const handleSelectDiscipline = (d) => {
-    playSound('open')
-    setBriefPreset({
-      service: d.name,
-      message: `Inquiry for ${d.name} (${currency === 'USD' ? d.metaUSD : d.metaNGN}, ${d.timeline}).`,
-    })
-    const el = document.getElementById('contact')
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
-  }
 
   return (
-    <section ref={ref} aria-label="Our standard" className="scroll-mt-24 overflow-hidden bg-obsidian text-bone">
-      <div className="noise relative">
-        {/* Ambient Gold Radial Light */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-32 -top-40 h-[560px] w-[560px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.16) 0%, transparent 68%)' }}
-        />
+    <section
+      ref={ref}
+      className="noise relative overflow-hidden bg-[#0A0A0A] py-24 text-[#FAF7F2] lg:py-32"
+      style={{ color: '#FAF7F2' }}
+    >
+      {/* Ambient gold light */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse at 20% 0%, rgba(184,146,74,0.14) 0%, transparent 55%), radial-gradient(ellipse at 90% 100%, rgba(184,146,74,0.10) 0%, transparent 50%)',
+        }}
+      />
 
-        <div className="container-page relative py-20 sm:py-24 lg:py-32">
-          {/* Headline */}
-          <div className="reveal mb-12 sm:mb-16">
-            <p className="section-label mb-4 !text-gold-lt">Our Core Thesis</p>
-            <p className="display text-bone" style={{ fontSize: 'clamp(34px,5.4vw,70px)', maxWidth: '22ch' }}>
-              Average work is a <span className="text-gold-lt">slow decline.</span>{' '}
-              Top one percent compounds forever.
-            </p>
-            <p className="mt-4 max-w-xl text-base sm:text-lg font-light text-muted">
-              We reject template aesthetics, bloated agency retainers, and outsourced sub-contractors.
-              Every project is architected for sovereign category dominance.
-            </p>
-          </div>
+      {/* Watermark */}
+      <span
+        aria-hidden="true"
+        className="top-wordmark pointer-events-none absolute -bottom-[0.3em] left-1/2 -translate-x-1/2 select-none opacity-[0.04]"
+        style={{ fontSize: 'clamp(140px, 26vw, 420px)' }}
+      >
+        1%
+      </span>
 
-          {/* Discipline Index */}
-          <ol className="border-t border-graphite">
-            {DISCIPLINES.map((d, i) => {
-              const metaPrice = currency === 'USD' ? d.metaUSD : d.metaNGN
-              return (
-                <li key={d.name} className="reveal">
-                  <button
-                    type="button"
-                    onClick={() => handleSelectDiscipline(d)}
-                    className="group flex w-full items-baseline justify-between gap-6 border-b border-graphite py-5 sm:py-7 text-left transition-colors duration-300 hover:border-gold/60"
-                  >
-                    <span className="flex items-baseline gap-4 sm:gap-6">
-                      <span className="font-syne text-xs font-bold tracking-[0.2em] text-gold-lt/70">
-                        0{i + 1}
-                      </span>
-                      <span className="font-syne text-xl font-bold text-bone transition-colors duration-300 group-hover:text-gold-lt sm:text-2xl lg:text-3xl">
-                        {d.name}
-                      </span>
-                    </span>
-
-                    <span className="hidden text-sm text-muted transition-colors duration-300 group-hover:text-gold-lt/90 sm:block">
-                      {metaPrice} · {d.timeline}
-                    </span>
-
-                    <span
-                      className="arrow shrink-0 font-syne text-lg text-gold-lt/60 transition-colors duration-300 group-hover:text-gold-lt"
-                      aria-hidden="true"
-                    >
-                      →
-                    </span>
-                  </button>
-                </li>
-              )
-            })}
-          </ol>
+      <div className="container-page relative z-10">
+        <div className="reveal mx-auto mb-16 max-w-3xl text-center">
+          <Badge variant="gold" className="mb-6">The Standard</Badge>
+          <h2
+            className="display leading-[1.08]"
+            style={{ fontSize: 'clamp(28px, 4.4vw, 52px)' }}
+          >
+            “We are not a vendor. We are the{' '}
+            <span className="text-gold-lt">technical co-founders</span> you wish you had
+            hired on day one.”
+          </h2>
+          <p className="mx-auto mt-6 max-w-xl text-sm font-light leading-relaxed" style={{ color: 'rgba(250,247,242,0.65)' }}>
+            T.O.P exists because brilliant African founders kept losing months and millions to
+            bloated agencies and ghosting freelancers. We flipped the model: senior-only teams,
+            fixed scope, total transparency, and work that defends itself in any room.
+          </p>
         </div>
 
-        {/* Large Clipped Watermark Text */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none relative select-none overflow-hidden"
-          style={{
-            marginTop: '-0.15em',
-            marginBottom: '-0.2em',
-            textAlign: 'center',
-          }}
-        >
-          <span
-            className="top-wordmark block text-bone/[0.04] whitespace-nowrap"
-            style={{ fontSize: 'clamp(80px, 20vw, 320px)', letterSpacing: '-0.04em' }}
-          >
-            TOP ONE PERCENT
-          </span>
+        <Separator className="mx-auto mb-16 max-w-4xl" style={{ background: 'rgba(250,247,242,0.12)' }} />
+
+        <div className="mx-auto grid max-w-5xl gap-x-12 gap-y-10 sm:grid-cols-2">
+          {BELIEFS.map((b, i) => (
+            <div key={b.title} className="reveal flex gap-5">
+              <span className="font-mono text-xs font-bold text-gold-lt" aria-hidden="true">
+                0{i + 1}
+              </span>
+              <div>
+                <h3 className="mb-2 font-syne text-base font-bold leading-snug lg:text-lg">
+                  {b.title}
+                </h3>
+                <p className="text-sm font-light leading-relaxed" style={{ color: 'rgba(250,247,242,0.6)' }}>
+                  {b.desc}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

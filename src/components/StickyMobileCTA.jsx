@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { ArrowRight, MessageCircle } from 'lucide-react'
 import { SITE } from '../data/site.js'
+import { Button } from './ui/button.jsx'
 
 export default function StickyMobileCTA() {
   const [visible, setVisible] = useState(false)
@@ -44,20 +46,25 @@ export default function StickyMobileCTA() {
         transition: 'transform .35s cubic-bezier(0.16,1,0.3,1), opacity .3s ease, visibility .3s ease',
       }}
     >
-      <div className="border-t border-border bg-surface/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl shadow-2xl">
+      <div className="border-t border-border bg-background/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-2xl backdrop-blur-xl">
         <div className="flex items-center gap-2.5">
-          <a href="#contact" className="btn-gold flex-1 text-center !min-h-[46px] !text-xs">
-            Start Project Brief <span className="arrow" aria-hidden="true">→</span>
-          </a>
-          <a
-            href={SITE.whatsapp}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-xl border border-border bg-surface2 text-emerald-500 hover:border-emerald-500"
+          <Button asChild className="flex-1">
+            <a href="#contact">
+              Start Project Brief
+              <ArrowRight />
+            </a>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            size="icon"
+            className="size-[46px] shrink-0 text-success hover:bg-success/10 hover:text-success"
             aria-label="Direct WhatsApp chat with CEO"
           >
-            <span className="text-xl">💬</span>
-          </a>
+            <a href={SITE.whatsapp} target="_blank" rel="noreferrer noopener">
+              <MessageCircle className="size-5" />
+            </a>
+          </Button>
         </div>
       </div>
     </div>

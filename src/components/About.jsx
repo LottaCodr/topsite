@@ -1,120 +1,117 @@
+import { ArrowRight, BadgeCheck, MapPin, ShieldCheck, Users } from 'lucide-react'
+import { SITE } from '../data/site.js'
 import { useReveal } from '../hooks/useReveal.js'
-import { BELIEFS, SITE } from '../data/site.js'
+import { Button } from './ui/button.jsx'
+import { Card, CardContent } from './ui/card.jsx'
+import { Separator } from './ui/separator.jsx'
 
-const SKILLS = ['Next.js 15', 'React 19', 'TypeScript', 'FastAPI (Python)', 'React Native', 'Supabase & Postgres', 'Claude & OpenAI APIs', 'Figma & Design Tokens', 'Blender 3D', 'After Effects']
+const PILLARS = [
+  {
+    icon: Users,
+    title: 'Senior-only, by policy',
+    desc: 'Every line of code and every vector is produced by senior architects. We do not staff juniors on client work, ever.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Total IP ownership',
+    desc: 'Repos, Figma libraries, database schemas, and documentation transfer 100% to you at handover. Zero licensing strings.',
+  },
+  {
+    icon: BadgeCheck,
+    title: 'Fixed-scope economics',
+    desc: 'Milestone-based pricing agreed before kickoff. No billable-hour creep, no surprise change orders.',
+  },
+]
 
 export default function About() {
   const ref = useReveal()
 
   return (
-    <section id="about" ref={ref} className="scroll-mt-24 bg-surface py-24 lg:py-32 border-b border-border">
+    <section id="about" ref={ref} className="scroll-mt-24 border-b border-border bg-secondary/30 py-24 lg:py-32">
       <div className="container-page">
-
-        {/* Section Header */}
-        <div className="mb-16 grid grid-cols-1 gap-10 lg:mb-20 lg:grid-cols-2 lg:gap-16">
+        <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
+          {/* Copy */}
           <div className="reveal">
-            <p className="section-label mb-4">Origin &amp; Philosophy</p>
-            <h2 className="display text-ink" style={{ fontSize: 'clamp(30px,4.6vw,52px)' }}>
-              Built at the crossroads of<br /><span className="text-gold">taste &amp; engineering.</span>
+            <p className="section-label mb-4">Origin & Philosophy</p>
+            <h2 className="display mb-6 text-foreground" style={{ fontSize: 'clamp(30px,4.6vw,52px)' }}>
+              Founded in Abuja.
+              <br />
+              Built for the <span className="text-gold">global top one percent.</span>
             </h2>
-          </div>
-          <div className="reveal flex flex-col justify-end gap-4 text-base sm:text-lg font-light leading-relaxed">
-            <p className="text-ink2">
-              Top One Percent was founded on a simple observation: most category-leading companies
-              build incredible technology, but have completely outgrown their digital presentation.
-            </p>
-            <p className="text-subtle">
-              We close that gap permanently — by merging high-taste editorial branding, sub-second
-              AI application development, and kinetic motion under one disciplined roof in Abuja.
-            </p>
-          </div>
-        </div>
+            <div className="flex flex-col gap-4 text-base font-light leading-relaxed text-muted-foreground">
+              <p>
+                {SITE.pitch} T.O.P was founded in {SITE.founded} by {SITE.founder.name} to prove
+                that world-class product engineering and brand architecture could ship from
+                Nigeria: faster, sharper, and more transparent than any agency in London or
+                San Francisco.
+              </p>
+              <p>
+                We operate as a small, deliberate studio: a handful of senior architects,
+                designers, and creative technologists who refuse to scale headcount at the
+                expense of craft. Every engagement gets direct founder attention from first
+                brief to final handover.
+              </p>
+            </div>
 
-        {/* Core Beliefs 2x2 */}
-        <div className="mb-20">
-          <p className="reveal section-label mb-8">What We Stand For</p>
-          <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {BELIEFS.map((b, i) => (
-              <li key={i} className="reveal">
-                <div className="card-base card-hover flex h-full flex-col justify-between p-6 sm:p-8 bg-surface2/60">
-                  <div className="mb-4 flex items-center justify-between">
-                    <span className="font-syne text-sm font-extrabold text-gold">
-                      PRINCIPLE 0{i + 1}
-                    </span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-gold/50" />
-                  </div>
-                  <h3 className="font-syne text-lg font-bold text-ink mb-2">{b.title}</h3>
-                  <p className="text-sm font-light leading-relaxed text-subtle">{b.desc}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild variant="outline">
+                <a href="#work">
+                  See the Evidence
+                  <ArrowRight />
+                </a>
+              </Button>
+              <Button asChild variant="ghost" className="text-muted-foreground">
+                <a href="#contact">Talk to the Founder</a>
+              </Button>
+            </div>
+          </div>
 
-        {/* Founder Spotlight Card */}
-        <div className="reveal">
-          <div className="card-base overflow-hidden bg-surface2 border-gold/30 shadow-2xl">
-            <div className="grid gap-0 lg:grid-cols-12">
-              {/* Obsidian Identity Column */}
-              <div className="noise relative flex items-center gap-5 bg-obsidian text-bone p-6 sm:p-10 lg:col-span-4 lg:flex-col lg:items-start lg:justify-center">
-                <div
+          {/* Founder card + pillars */}
+          <div className="flex flex-col gap-5">
+            <Card className="reveal overflow-hidden border-gold/25 py-0">
+              <CardContent className="flex items-center gap-5 p-6 sm:p-7">
+                <span
+                  className="grid size-20 shrink-0 place-items-center rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/25 to-gold/5 font-syne text-2xl font-extrabold text-gold"
                   aria-hidden="true"
-                  className="pointer-events-none absolute -left-10 -top-10 h-52 w-52 rounded-full"
-                  style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.2) 0%, transparent 70%)' }}
-                />
-                <div className="relative grid h-16 w-16 sm:h-20 sm:w-20 shrink-0 place-items-center rounded-2xl border border-graphite bg-charcoal shadow-xl">
-                  <span className="font-syne text-2xl sm:text-3xl font-extrabold text-gold-lt">
-                    {SITE.founder.initials}
-                  </span>
-                </div>
-                <div className="relative">
-                  <p className="font-syne text-lg sm:text-xl font-bold text-bone lg:mt-6">
+                >
+                  {SITE.founder.initials}
+                </span>
+                <div className="min-w-0">
+                  <p className="font-display text-xl font-extrabold text-foreground">
                     {SITE.founder.name}
                   </p>
-                  <p className="mt-1 text-xs sm:text-sm text-gold-lt font-semibold">
+                  <p className="mb-2 font-syne text-xs font-bold uppercase tracking-widest text-gold">
                     {SITE.founder.role}
                   </p>
-                  <p className="mt-1 text-xs text-muted font-mono">
-                    {SITE.location} · {SITE.timezoneDisplay}
+                  <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <MapPin className="size-3.5" />
+                    {SITE.founder.location}
                   </p>
                 </div>
-              </div>
+              </CardContent>
+              <Separator />
+              <CardContent className="p-6 sm:p-7">
+                <p className="text-sm font-light leading-relaxed text-muted-foreground">
+                  “{SITE.founder.bio}”
+                </p>
+              </CardContent>
+            </Card>
 
-              {/* Founder Statement & Skills */}
-              <div className="p-6 sm:p-10 lg:col-span-8 lg:p-12 flex flex-col justify-between">
-                <div>
-                  <blockquote className="mb-6 border-l-2 border-gold pl-5">
-                    <p className="font-syne text-lg sm:text-xl font-bold leading-snug text-ink">
-                      &ldquo;Ambitious founders building the most impactful technology deserve
-                      to be presented with unmistakable market authority.&rdquo;
-                    </p>
-                  </blockquote>
-
-                  <p className="mb-6 text-sm sm:text-base font-light leading-relaxed text-subtle">
-                    {SITE.founder.bio}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[11px] uppercase tracking-wider text-muted font-bold mb-3 font-syne">
-                    Core Technical &amp; Design Architecture:
-                  </p>
-                  <ul className="flex flex-wrap gap-2">
-                    {SKILLS.map((s) => (
-                      <li
-                        key={s}
-                        className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-ink2"
-                      >
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              {PILLARS.map((p) => (
+                <Card key={p.title} className="reveal border-border py-5">
+                  <CardContent className="px-5">
+                    <span className="mb-3 grid size-9 place-items-center rounded-lg border border-gold/30 bg-gold/10 text-gold">
+                      <p.icon className="size-4" />
+                    </span>
+                    <h3 className="mb-1.5 font-syne text-sm font-bold text-foreground">{p.title}</h3>
+                    <p className="text-xs font-light leading-relaxed text-muted-foreground">{p.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </div>
-
       </div>
     </section>
   )

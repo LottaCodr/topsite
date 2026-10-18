@@ -1,146 +1,124 @@
-import { useState, useMemo } from 'react'
-import { useReveal } from '../hooks/useReveal.js'
+import { useMemo, useState } from 'react'
+import { MessageCircleQuestion, Search } from 'lucide-react'
 import { FAQS, SITE } from '../data/site.js'
 import { useApp } from '../hooks/useApp.js'
+import { useReveal } from '../hooks/useReveal.js'
+import { Button } from './ui/button.jsx'
+import { Input } from './ui/input.jsx'
+import { Tabs, TabsList, TabsTrigger } from './ui/tabs.jsx'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './ui/accordion.jsx'
 
-const CATEGORIES = ['All Categories', 'Pricing & Budget', 'Process & Timelines', 'Team & Quality', 'Global & Remote', 'IP & Ownership', 'Payments & Milestones', 'Tech Stack & Standards']
+const CATEGORIES = ['All', ...Array.from(new Set(FAQS.map((f) => f.category)))]
 
 export default function FAQ() {
   const ref = useReveal()
-  const [openIndex, setOpenIndex] = useState(0)
-  const [selectedCat, setSelectedCat] = useState('All Categories')
-  const [searchQuery, setSearchQuery] = useState('')
   const { playSound } = useApp()
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('All')
 
-  const filteredFaqs = useMemo(() => {
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
     return FAQS.filter((f) => {
-      const matchCat = selectedCat === 'All Categories' || f.category === selectedCat
-      const matchQuery =
-        searchQuery === '' ||
-        f.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        f.a.toLowerCase().includes(searchQuery.toLowerCase())
-      return matchCat && matchQuery
+      const inCategory = category === 'All' || f.category === category
+      const inQuery =
+        !q ||
+        f.q.toLowerCase().includes(q) ||
+        f.a.toLowerCase().includes(q) ||
+        f.category.toLowerCase().includes(q)
+      return inCategory && inQuery
     })
-  }, [selectedCat, searchQuery])
+  }, [query, category])
 
   return (
-    <section id="faq" ref={ref} className="scroll-mt-24 bg-surface py-24 lg:py-32 border-b border-border">
+    <section id="faq" ref={ref} className="scroll-mt-24 border-b border-border py-24 lg:py-32">
       <div className="container-page">
-
-        {/* Header */}
-        <div className="mb-12 grid gap-8 lg:grid-cols-12 lg:gap-16">
-          <header className="reveal lg:col-span-5">
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
+          {/* Header column */}
+          <div className="reveal lg:col-span-4">
             <p className="section-label mb-4">Direct Answers</p>
-            <h2 className="display mb-5 text-ink" style={{ fontSize: 'clamp(30px,4.2vw,48px)' }}>
-              Everything answered<br />before you <span className="text-gold">ask.</span>
+            <h2 className="display mb-5 text-foreground" style={{ fontSize: 'clamp(30px,4.2vw,48px)' }}>
+              Questions, <span className="text-gold">answered.</span>
             </h2>
-            <p className="text-base font-light leading-relaxed text-subtle mb-6">
-              Have a specialized enterprise inquiry or custom timeline requirement?{' '}
-              <a
-                href={`mailto:${SITE.email}`}
-                className="text-gold font-semibold underline underline-offset-4 hover:text-gold-dk"
-              >
-                Email Lotanna directly
-              </a>{' '}
-              — we reply in under 24 hours.
+            <p className="mb-6 max-w-sm text-sm font-light leading-relaxed text-muted-foreground">
+              Pricing, process, ownership, and payments: the things agencies usually
+              hide in fine print. We put them on the page.
             </p>
+            <Button asChild variant="outline">
+              <a href="#contact" onClick={() => playSound('open')}>
+                Ask Something Else
+                <MessageCircleQuestion />
+              </a>
+            </Button>
+          </div>
 
-            {/* Live Search Input */}
-            <div className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search questions or keywords..."
-                className="field !pl-10 !text-sm"
-              />
-              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted text-sm">
-                🔍
-              </span>
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-ink"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          </header>
+          {/* Accordion column */}
+          <div className="reveal lg:col-span-8">
+            {/* Search + category filter */}
+            <div className="mb-8 flex flex-col gap-4">
+              <div className="relative">
+                <Search className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search questions: pricing, IP, timelines…"
+                  aria-label="Search frequently asked questions"
+                  className="pl-10"
+                />
+              </div>
 
-          {/* Right Column: Category Filters & Accordions */}
-          <div className="lg:col-span-7 flex flex-col gap-6">
-            {/* Category Filter Chips */}
-            <div className="reveal flex flex-wrap gap-2">
-              {CATEGORIES.slice(0, 5).map((cat) => {
-                const isActive = selectedCat === cat
-                return (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => {
-                      setSelectedCat(cat)
-                      playSound('click')
-                    }}
-                    className={`rounded-full px-3 py-1 font-syne text-[11px] font-bold transition-all ${
-                      isActive
-                        ? 'bg-gold text-obsidian shadow'
-                        : 'border border-border bg-surface2 text-subtle hover:border-border2 hover:text-ink'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                )
-              })}
+              <Tabs
+                value={category}
+                onValueChange={(v) => {
+                  setCategory(v)
+                  playSound('click')
+                }}
+                className="gap-0"
+                aria-label="Filter questions by category"
+              >
+                <TabsList className="flex-wrap justify-start">
+                  {CATEGORIES.map((c) => (
+                    <TabsTrigger key={c} value={c}>
+                      {c}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
             </div>
 
-            {/* Accordion List */}
-            <ul className="divide-y divide-border border-y border-border">
-              {filteredFaqs.length === 0 ? (
-                <li className="py-8 text-center text-sm text-muted">
-                  No questions match &ldquo;{searchQuery}&rdquo;. Try another term or email us.
-                </li>
-              ) : (
-                filteredFaqs.map((f, i) => {
-                  const isOpen = openIndex === i
-                  return (
-                    <li key={f.q} className="reveal py-2">
-                      <details
-                        open={isOpen}
-                        onToggle={(e) => {
-                          if (e.currentTarget.open) {
-                            setOpenIndex(i)
-                            playSound('click')
-                          }
-                        }}
-                        className="group"
-                      >
-                        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left [&::-webkit-details-marker]:hidden">
-                          <span className="font-syne text-base sm:text-lg font-bold text-ink transition-colors group-hover:text-gold">
-                            {f.q}
-                          </span>
-                          <span
-                            aria-hidden="true"
-                            className="relative grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border bg-surface2 transition-colors group-open:border-gold group-open:bg-gold/10"
-                          >
-                            <span className="text-gold font-bold text-xs">
-                              {isOpen ? '—' : '+'}
-                            </span>
-                          </span>
-                        </summary>
-                        <p className="max-w-2xl pb-6 pr-6 sm:pr-10 text-sm sm:text-base font-light leading-relaxed text-subtle">
-                          {f.a}
-                        </p>
-                      </details>
-                    </li>
-                  )
-                })
-              )}
-            </ul>
+            {filtered.length > 0 ? (
+              <Accordion type="single" collapsible className="rounded-2xl border border-border bg-card px-6">
+                {filtered.map((f) => (
+                  <AccordionItem key={f.q} value={f.q}>
+                    <AccordionTrigger>
+                      <span className="pr-2">
+                        <span className="mr-3 font-mono text-xs text-gold" aria-hidden="true">
+                          {f.category.split(' ')[0]}
+                        </span>
+                        {f.q}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>{f.a}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
+                <p className="mb-2 font-syne font-bold text-foreground">No matching questions.</p>
+                <p className="mb-5 text-sm text-muted-foreground">
+                  We reply to every direct inquiry in under 24 hours. Ask us anything.
+                </p>
+                <Button asChild size="sm">
+                  <a href={`mailto:${SITE.email}`}>Email the Studio</a>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
-
       </div>
     </section>
   )

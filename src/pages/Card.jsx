@@ -20,7 +20,7 @@ TEL;TYPE=WORK,VOICE:${SITE.phone}
 EMAIL;TYPE=INTERNET,WORK:${SITE.email}
 URL:${SITE.url}
 ADR;TYPE=WORK:;;;Abuja;FCT;;Nigeria
-NOTE:${SITE.tagline} — ${SITE.url}
+NOTE:${SITE.tagline} · ${SITE.url}
 END:VCARD`
 
 export default function Card() {
@@ -73,7 +73,7 @@ export default function Card() {
       await navigator.clipboard.writeText(text)
       setToast(message)
     } catch {
-      setToast('Copy failed — long press to copy')
+      setToast('Copy failed. Long press to copy')
     }
   }
 
@@ -90,7 +90,7 @@ export default function Card() {
 
   const share = async () => {
     const data = {
-      title: 'T.O.P — Top One Percent',
+      title: 'T.O.P (Top One Percent)',
       text: `${SITE.founder.name} · ${SITE.tagline}`,
       url: `${SITE.url}/card`,
     }
@@ -127,7 +127,7 @@ export default function Card() {
       <div aria-live="polite" className="pointer-events-none fixed inset-x-0 top-6 z-50 flex justify-center px-4">
         {toast && (
           <span
-            className="rounded-full bg-obsidian px-5 py-2.5 text-xs sm:text-sm font-semibold text-bone shadow-2xl border border-gold/40"
+            className="rounded-lg bg-obsidian px-5 py-2.5 text-xs sm:text-sm font-semibold text-bone shadow-2xl border border-gold/40"
             style={{ animation: 'fadeUp .25s var(--ease-out-expo) both' }}
           >
             ✓ {toast}
@@ -150,7 +150,7 @@ export default function Card() {
           />
 
           <div className="relative z-10 mb-6 flex items-center justify-between">
-            <div className="inline-flex items-center gap-2 rounded-full border border-graphite bg-charcoal px-3 py-1">
+            <div className="inline-flex items-center gap-2 rounded-md border border-graphite bg-charcoal px-3 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse-slow" aria-hidden="true" />
               <span className="section-label !text-[9px] !text-gold-lt">{SITE.location} · Est. {SITE.founded}</span>
             </div>
@@ -355,7 +355,7 @@ export default function Card() {
         {/* Start Project CTA */}
         <div className="bg-surface2 px-7 pb-6 pt-5">
           <a
-            href={`mailto:${SITE.email}?subject=${encodeURIComponent('Project Brief — T.O.P')}`}
+            href={`mailto:${SITE.email}?subject=${encodeURIComponent('Project Brief: T.O.P')}`}
             className="btn-gold w-full text-center"
           >
             Initiate Project Brief <span className="arrow" aria-hidden="true">→</span>
